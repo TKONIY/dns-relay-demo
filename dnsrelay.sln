@@ -3,7 +3,12 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "source_code", "source_code\source_code.vcxproj", "{BB655455-10D2-4D13-AAB4-9EFC855E87BC}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dnsrelay", "source_code\source_code.vcxproj", "{BB655455-10D2-4D13-AAB4-9EFC855E87BC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{07B219F3-B55A-4632-A8D0-C654032F1F90}"
+	ProjectSection(SolutionItems) = preProject
+		README.md = README.md
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
