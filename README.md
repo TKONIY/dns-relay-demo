@@ -1,6 +1,6 @@
 # DNS-Relay —— DNS中继器
 ## 1. 框架
-![流程图](./images/design.svg)
+![流程图](./images/design.png)
 ## 2. 编码规范
 * 变量名: `yourFather`
 * 函数名: `YourFather`
