@@ -2,12 +2,11 @@
 #include<winsock2.h>
 #include<WS2tcpip.h>
 #include<conio.h>
-#pragma comment(lib,"ws2_32.lib")
 
 #include "control.h"
 #include "database.h"
 #include "resolve.h"
-
+#pragma comment(lib,"ws2_32.lib")
 
 int main(int argc, char* argv[]) {
 
@@ -62,11 +61,7 @@ int main(int argc, char* argv[]) {
 	printf("Server: Receiving port used : % d\n", htons(addrSrv.sin_port));
 	printf("Server: I\'m ready to receive a datagram...\n");
 
-
-	/* 初始化数据表 */
-	InitClientTable();
-
-
+	InitCTable();/*初始化clientTable为空队列*/
 
 	/* 开始无尽的循环, 按下 Esc 退出循环 */
 	while (!(_kbhit() && _getch() == 27)) {

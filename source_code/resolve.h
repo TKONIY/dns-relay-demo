@@ -1,6 +1,6 @@
 #pragma once
 #include <string.h>
-#include <winsock.h>
+#include <winsock2.h>
 #include"database.h"
 #include"control.h"
 

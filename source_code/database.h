@@ -1,11 +1,36 @@
 #pragma once
+#include <stdio.h>
+#include <winsock2.h>
+
+#define MAX_QUERIES 10 /*最大支持的同时等待的用户query数*/
+
+typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
+/*
+	Discription:			存放用户query记录的结构
+	Attributes:
+		SOCKADDR_IN addr	socket地址
+		DNSID originId		用户发送的DNS报文的ID
+		unsigned char r;	表示这个是否被reply了
+*/
+
+typedef struct {
+	SOCKADDR addr;
+	DNSID originId;
+	unsigned char r;
+}CRecord;
+
 /*
 	Discription:	ClientTable结构体
-	Attributes:		
-*/	
+	Attributes:
+		CRecord base[MAX_QUERIES];	等待窗口
+		int front					头指针
+		int rear					尾指针
+*/
 typedef struct {
-	int a;
-}CTable;
+	CRecord base[MAX_QUERIES];
+	int front;
+	int rear;
+}CQueue;
 
 /********************ClientTable系列方法******************/
 
@@ -14,21 +39,70 @@ typedef struct {
 	Params:			void
 	Return:			void
 */
-extern void InitClientTable(); 
+extern void InitCTable();
 
 /*
-	Discription:	打印ClientTable(没啥用
+	Discription:	打印ClientTable状态
 	Params:			void
 	Return:			void
 */
-extern void DebugClientTable();
+extern void DebugCTable();
 
-/*	
-	Discription:	向ClientTable中添加记录
-	Params:			void
-	Return:			void
+/*
+	Discription:		向ClientTable的队尾添加记录
+	Params:			
+		SOCKADDR* pAddr	地址
+		DNSID id		原id
+	Return:				
+		char			0/1表示是否成功
 */
-extern void AddToClientTable();
+extern char PushCRecord(SOCKADDR* pAddr, DNSID id);
+
+/*
+	Discription:		将队首记录弹出
+	Params:
+		DNSID id		指定的DNS报文
+	Return:
+		char			0/1表示是否成功
+*/
+extern char PopCRecord();
+
+
+/*
+	Discription:		将指定记录修改为已回复
+	Params:
+		DNSID id		指定的DNS报文
+	Return:
+		char			0/1表示是否成功
+*/
+extern char SetCRecordR(DNSID id);
+
+/*
+	Discription:		根据转发ID查找原ID和地址
+	Params:
+		DNSID id;			id
+		CRecord* pRecord	存放record的地址
+	Return
+		char				0/1表示是否成功。
+*/
+extern char FindCRecord(DNSID id, CRecord* pRecord);
+
+/*
+	Discription:		获取队尾元素的序号
+	Params:
+	Return:
+		int				序号
+						
+*/
+extern int GetCTableRearIndex();
+
+/*
+	Discription:		获取队首元素序号
+	Params:			
+	Return:				
+		int				序号	
+*/
+extern int GetCTableFrontIndex();
 
 
 /******************DNSTable系列方法***********************/

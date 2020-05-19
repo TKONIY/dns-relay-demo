@@ -15,3 +15,37 @@
 * 注释统一使用 `/* ... */` 不要用`//`
 * else 不换行, 记得在格式化设置里面调好。
 ## 3. 接口说明
+## 4. 结构体设计
+### [1] clientRecord
+```C
+typedef struct {
+	SOCKADDR addr;
+	DNSID originId;
+	unsigned char r;
+}CRecord;
+``` 
+### [2] clientTable
+```C
+typedef struct {
+	CRecord base[MAX_QUERIES];
+	int front;
+	int rear;
+}CQueue;
+```
+* 由多个`clientRecord`组成的队列，循环数组。
+* 服务器最多支持MAX_QUERY个请求同时等待。队列满了之后丢弃新包。
+* 每次收到一个来自客户端的query报文时。
+  * 将客户端地址和报文ID入队。
+  * 如果入队成功,调用获取队尾元素序号,作为转发DNS的ID发送给服务器。
+* 每次收到一个response时。
+  * 在队列中查找对应ID的query是否未回复。
+  * 如果未回复,则回复并将r置为1。
+  * 并且把这个DNS发回给客户端。  
+* 每次检查计时器时。
+  * 从队头开始检查。
+  * 如果已经回复,则将其pop出来。
+  * 如果超时,则将其pop出来重新加入队列并发送。
+  * 如果没有超时并且r=0,则停止检查。
+
+### 待解决问题
+* 如何处理0.0.0.0的记录？
