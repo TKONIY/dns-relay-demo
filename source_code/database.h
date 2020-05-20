@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <winsock2.h>
 
-#define MAX_QUERIES 10 /*最大支持的同时等待的用户query数*/
+#define MAX_QUERIES 1000 /*最大支持的同时等待的用户query数*/
 
 typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 /*
@@ -13,7 +13,7 @@ typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 		unsigned char r;	表示这个是否被reply了
 */
 
-typedef struct {
+typedef struct clientRecord{
 	SOCKADDR addr;
 	DNSID originId;
 	unsigned char r;
@@ -56,7 +56,7 @@ extern void DebugCTable();
 	Return:				
 		char			0/1表示是否成功
 */
-extern char PushCRecord(SOCKADDR* pAddr, DNSID id);
+extern char PushCRecord(SOCKADDR* pAddr, DNSID *pId);
 
 /*
 	Discription:		将队首记录弹出

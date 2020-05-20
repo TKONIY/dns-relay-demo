@@ -9,7 +9,7 @@
 #pragma comment(lib,"ws2_32.lib")
 
 int main(int argc, char* argv[]) {
-
+	
 	WSADATA wsaData;								/*协议版本信息*/
 	SOCKADDR_IN addrSrv;							/*服务端(dnsrelay)地址*/
 	SOCKADDR_IN addrCli;							/*客户端地址*/
@@ -21,6 +21,7 @@ int main(int argc, char* argv[]) {
 	unsigned char sendBuf[MAX_BUFSIZE] = { '\0' };	/*发送缓冲*/
 	int recvByte = 0;								/*recvBuf存放的报文大小*/
 	int sendByte = 0;								/*sendBuf存放的报文大小*/
+	
 
 	/* 获取socket版本2.2 */
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -87,7 +88,7 @@ int main(int argc, char* argv[]) {
 			} else
 				printf("datagram received. %d Bytes in all.\n", recvByte);
 
-			/*判断接收的是response还是query,并处理*/
+			/*判断接收的是response还是query,更新报文sendBuf,更新发送目标addrCli(不一定是客户端,也可能是DNS服务器*/
 			if ((recvBuf[2] & 0x80) >> 7 == 0) {
 				printf("收到一个请求报文。内容如下:\n");
 				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
@@ -96,6 +97,7 @@ int main(int argc, char* argv[]) {
 				printf("收到一个响应报文。内容如下:\n");
 				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
 				sendByte = ResolveResponse(recvBuf, sendBuf, recvByte, &addrCli);
+				break;/*暂时先不考虑收到响应的情况*/
 			}
 
 			/*发送报文*/

@@ -15,14 +15,15 @@ void DebugCTable() {
 	printf("队列最大缓存%d 已使用%d\n", MAX_QUERIES, used);
 }
 
-char PushCRecord(SOCKADDR*pAddr, DNSID id) {
+char PushCRecord(SOCKADDR*pAddr, DNSID *pId) {
 	if ((clientTable.rear + 1) % MAX_QUERIES == clientTable.front) {
 		printf("队列已满,丢弃报文\n.");
 		return 0;
 	} else {
 		clientTable.base[clientTable.rear].addr = *pAddr;
-		clientTable.base[clientTable.rear].originId = id;
+		clientTable.base[clientTable.rear].originId = *pId;
 		clientTable.base[clientTable.rear].r = 0;
+		*pId = clientTable.rear;/*获取新的ID*/
 		clientTable.rear = (clientTable.rear + 1) % MAX_QUERIES;
 		return 1;
 	}
