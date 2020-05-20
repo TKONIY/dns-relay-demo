@@ -32,17 +32,6 @@ typedef struct {
 	int rear;
 }CQueue;
 ```
-### [3] DNSHeader(待完善)
-```C
-typedef struct dnsheader{
-	unsigned short ID;		
-	unsigned short FLAGS;	/*2字节的各种flag*/
-	unsigned short QDCOUNT;	
-	unsigned short ANCOUNT;
-	unsigned short NSCOUNT;
-	unsigned short ARCOUNT;
-}DNSHeader;
-```
 * 由多个`clientRecord`组成的队列，循环数组。
 * 服务器最多支持MAX_QUERY个请求同时等待。队列满了之后丢弃新包。
 * 每次收到一个来自客户端的query报文时。
@@ -57,6 +46,19 @@ typedef struct dnsheader{
   * 如果已经回复,则将其pop出来。
   * 如果超时,则将其pop出来重新加入队列并发送。
   * 如果没有超时并且r=0,则停止检查。
+### [3] DNSHeader(待完善)
+```C
+typedef struct dnsheader{
+	unsigned short ID;		
+	unsigned short FLAGS;	/*2字节的各种flag*/
+	unsigned short QDCOUNT;	
+	unsigned short ANCOUNT;
+	unsigned short NSCOUNT;
+	unsigned short ARCOUNT;
+}DNSHeader;
+```
+* FLAGS包含很多字段。
+
 
 ## 5. 待解决问题
 * 如何处理0.0.0.0的记录？
