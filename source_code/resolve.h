@@ -9,14 +9,18 @@
 extern char addrDNSserv[];/*外部变量,理应为char*,可修改*/
 
 
+/*
+	Discription:	DNS头部结构体,12字节
+	Attributes:		暂时来说每个属性两字节,
+*/
 typedef struct dnsheader{
-	unsigned short ID;		/*2字节id*/
+	unsigned short ID;		
 	unsigned short FLAGS;	/*2字节的各种flag*/
-	unsigned short QDCOUNT;
+	unsigned short QDCOUNT;	
 	unsigned short ANCOUNT;
 	unsigned short NSCOUNT;
 	unsigned short ARCOUNT;
-}DNSHEADER;
+}DNSHeader;
 
 /*
 	Discription:	处理接收到query包的情况
