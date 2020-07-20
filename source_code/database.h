@@ -1,6 +1,7 @@
 #pragma once
 #include <stdio.h>
 #include <winsock2.h>
+#include <string.h>
 
 #define MAX_QUERIES 1000 /*最大支持的同时等待的用户query数*/
 
@@ -31,6 +32,7 @@ typedef struct {
 	int front;
 	int rear;
 }CQueue;
+
 
 /********************ClientTable系列方法******************/
 
@@ -110,16 +112,20 @@ extern int GetCTableFrontIndex();
 /*
 	Discription:	从ascii文件中构建DNS记录表
 	Params:
-	Return:			void
+	Return:			
+		char 0 失败
+		char 1 成功
 */
-extern void BuildDNSTable();
+extern char BuildDNSDatabase();
 
 /*
 	Discription:	在DNS中查找域名
 	Params:
-	Return:
+	Return: 
+		0: 没找到
+		1: 找到了
 */
-extern int FindInDNSTable();
+extern char FindInDNSDatabase();
 
 
 /******************DNSCache系列方法***********************/

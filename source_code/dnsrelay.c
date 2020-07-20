@@ -8,6 +8,11 @@
 #pragma comment(lib,"ws2_32.lib")
 
 int main(int argc, char* argv[]) {
+
+	if (!BuildDNSDatabase()) {
+		printf("Failed to build the database.\n");
+		return 0;
+	}
 	
 	WSADATA wsaData;								/*协议版本信息*/
 	SOCKADDR_IN addrSrv;							/*服务端(dnsrelay)地址*/

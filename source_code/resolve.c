@@ -1,6 +1,6 @@
 #include "resolve.h"
 
-extern char addrDNSserv[] = "192.168.0.1";
+extern char addrDNSserv[] = "192.168.0.1"; /*∂®“Â*/
 
 extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	if (1) {
