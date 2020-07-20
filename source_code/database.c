@@ -169,7 +169,6 @@ int DNSImport(sqlite3* db, const char* fname) {
 		fclose(fp);
 		return SQLITE_OK;
 	}
-
 }
 
 
@@ -206,9 +205,13 @@ char BuildDNSDatabase()
 	return 1;
 }
 
-char FindInDNSDatabase()
+char FindInDNSDatabase(const char* domainName,char*ip)
 {
-	return 0;
+	if (SQLITE_OK == DNSSelect(db, domainName, ip)) { /*ур╣╫ак*/
+		return 1;
+	} else {
+		return 0;
+	}
 }
 
 

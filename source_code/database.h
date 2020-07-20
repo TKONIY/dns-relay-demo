@@ -121,11 +121,14 @@ extern char BuildDNSDatabase();
 /*
 	Discription:	在DNS中查找域名
 	Params:
+		domainName	域名
+		ip			ip地址，返回值,请保证至少有16字节的空间(15个字符+\0)
+		
 	Return: 
 		0: 没找到
 		1: 找到了
 */
-extern char FindInDNSDatabase();
+extern char FindInDNSDatabase(const char* domainName, char*ip);
 
 
 /******************DNSCache系列方法***********************/

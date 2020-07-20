@@ -8,7 +8,7 @@ extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recv
 		DNSHeader* header = (DNSHeader*)recvBuf;
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
-		if (PushCRecord(addrCli,&newID)) {/*如果成功加入队列*/
+		if (PushCRecord((SOCKADDR*)addrCli,&newID)) {/*如果成功加入队列*/
 			/*填写发送缓冲*/
 			memcpy(sendBuf, recvBuf, recvByte);
 			/*更新转发ID*/

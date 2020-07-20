@@ -340,3 +340,4 @@ ASALocalRun/
 healthchecksdb
 /source_code/dnsrelay.txt
 /source_code/dnsrelay.db
+/source_code/dnsrelay.db-journal
