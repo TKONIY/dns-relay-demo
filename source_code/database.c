@@ -80,3 +80,5 @@ int GetCTableFrontIndex() {
 	return clientTable.front;
 }
 
+
+

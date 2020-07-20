@@ -5,9 +5,6 @@ extern char addrDNSserv[] = "192.168.0.1";
 extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	if (1) {
 		/*如果在数据库中找不到,则直接转发给本地DNS服务器---*/
-
-
-
 		DNSHeader* header = (DNSHeader*)recvBuf;
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
@@ -26,9 +23,7 @@ extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recv
 		} else {
 			return -1;
 		}
-
-
-	} else {
+	} else { //找得到，直接发送结果
 		/*sendBuf[2] |= 0x80;*//*该字节与1000 0000进行按位或运算,即将最高位置为1*/
 	}
 }

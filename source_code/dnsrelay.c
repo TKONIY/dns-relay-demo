@@ -2,7 +2,6 @@
 #include<winsock2.h>
 #include<WS2tcpip.h>
 #include<conio.h>
-
 #include "control.h"
 #include "database.h"
 #include "resolve.h"
