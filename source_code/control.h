@@ -8,9 +8,6 @@
 #define MAX_BUFSIZE 512
 typedef enum { dgram_arrival, timeout } event_type;
 
-static char emptyBuffer[MAX_BUFSIZE] = { '\0' }; //空buffer
-
-
 
 /*
 	核心组件.
@@ -46,4 +43,4 @@ extern void DebugBuffer(const unsigned char * buf, int bufSize);
 		@bufSize	要清空的内存区大小
 	return:			void
 */
-extern void ClearBuffer(const unsigned char* buf, int bufSize);
+extern void ClearBuffer(unsigned char* buf, int bufSize);

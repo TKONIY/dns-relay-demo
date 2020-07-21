@@ -1,5 +1,7 @@
 #include "control.h"
 
+static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; //¿Õbuffer
+
 
 event_type WaitForEvent() {
 
@@ -25,11 +27,11 @@ void DebugBuffer(const unsigned char* buf, int bufSize) {
 	}
 }
 
-void ClearBuffer(const unsigned char* buf, int bufSize) {
+void ClearBuffer(unsigned char* buf, int bufSize) {
 	if (bufSize > MAX_BUFSIZE)
 		printf("ClearBuffer() failed, bufSize too big: %d>%d\n", bufSize, MAX_BUFSIZE);
 	else if (bufSize < 0)
 		printf("ClearBuffer() failed, bufSize error: %d\n", bufSize);
 	else 
-		memcpy(buf, emptyBuffer, bufSize);
+		memcpy(buf,emptyBuffer, bufSize);
 }
