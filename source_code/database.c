@@ -19,7 +19,7 @@ void DebugCTable() {
 	printf("队列最大缓存%d 已使用%d\n", MAX_QUERIES, used);
 }
 
-char PushCRecord(SOCKADDR* pAddr, DNSID* pId) {
+char PushCRecord(const SOCKADDR* pAddr, DNSID* pId) {
 	if ((clientTable.rear + 1) % MAX_QUERIES == clientTable.front) {
 		printf("队列已满,丢弃报文\n.");
 		return 0;
@@ -207,7 +207,8 @@ char BuildDNSDatabase()
 
 char FindInDNSDatabase(const char* domainName,char*ip)
 {
-	if (SQLITE_OK == DNSSelect(db, domainName, ip)) { /*找到了*/
+	if (db && SQLITE_OK == DNSSelect(db, domainName, ip)) { 
+		/*db不为空且找到了对应记录*/
 		return 1;
 	} else {
 		return 0;

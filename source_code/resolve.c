@@ -1,8 +1,8 @@
 #include "resolve.h"
 
-extern char addrDNSserv[] = "192.168.0.1"; /*定义*/
+extern const char addrDNSserv[] = "192.168.0.1"; /*定义*/
 
-extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
+extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	if (1) {
 		/*如果在数据库中找不到,则直接转发给本地DNS服务器---*/
 		DNSHeader* header = (DNSHeader*)recvBuf;
@@ -28,6 +28,6 @@ extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recv
 	}
 }
 
-extern int ResolveResponse(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
+extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	return recvByte;
 }

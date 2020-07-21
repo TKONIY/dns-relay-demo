@@ -37,7 +37,7 @@ extern event_type WaitForEvent();
 		@bufSize	要打印的内存区大小
 	Return:			void
 */
-extern void DebugBuffer(unsigned char * buf, int bufSize);
+extern void DebugBuffer(const unsigned char * buf, int bufSize);
 
 /*
 	Discription:	清空缓冲区
@@ -46,4 +46,4 @@ extern void DebugBuffer(unsigned char * buf, int bufSize);
 		@bufSize	要清空的内存区大小
 	return:			void
 */
-extern void ClearBuffer(unsigned char* buf, int bufSize);
+extern void ClearBuffer(const unsigned char* buf, int bufSize);

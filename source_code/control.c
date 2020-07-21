@@ -6,7 +6,7 @@ event_type WaitForEvent() {
 	return dgram_arrival;
 }
 
-void DebugBuffer(unsigned char* buf, int bufSize) {
+void DebugBuffer(const unsigned char* buf, int bufSize) {
 	char isEnd = 0;
 	if (bufSize > MAX_BUFSIZE)
 		printf("DebugBuffer() failed, bufSize too big: %d>%d", bufSize, MAX_BUFSIZE);
@@ -25,7 +25,7 @@ void DebugBuffer(unsigned char* buf, int bufSize) {
 	}
 }
 
-void ClearBuffer(unsigned char* buf, int bufSize) {
+void ClearBuffer(const unsigned char* buf, int bufSize) {
 	if (bufSize > MAX_BUFSIZE)
 		printf("ClearBuffer() failed, bufSize too big: %d>%d\n", bufSize, MAX_BUFSIZE);
 	else if (bufSize < 0)

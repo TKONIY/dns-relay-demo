@@ -53,12 +53,12 @@ extern void DebugCTable();
 /*
 	Discription:		向ClientTable的队尾添加记录
 	Params:			
-		SOCKADDR* pAddr	地址
+		SOCKADDR* pAddr	地址(传入)
 		DNSID id		原id
 	Return:				
 		char			0/1表示是否成功
 */
-extern char PushCRecord(SOCKADDR* pAddr, DNSID *pId);
+extern char PushCRecord(const SOCKADDR* pAddr, DNSID *pId);
 
 /*
 	Discription:		将队首记录弹出

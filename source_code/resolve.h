@@ -25,14 +25,14 @@ typedef struct dnsheader{
 /*
 	Discription:	处理接收到query包的情况
 	params:			
-		recvBuf:	接收缓存
-		sendBuf:	发送缓存
-		recvByte:	接收到的字节数
-		addrCli:	&新的目标地址
+		recvBuf:	接收缓存(传入参数)
+		sendBuf:	发送缓存(传出参数)
+		recvByte:	接收到的字节数(传入参数)
+		addrCli:	&新的目标地址(传出参数)
 	return:			int	---- 最终写入到sendBuf的字节数
 					
 */
-extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli);
+extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf,  int recvByte, SOCKADDR_IN* addrCli);
 
 /*
 	Discription:	处理接收到Response包的情况
@@ -43,4 +43,4 @@ extern int ResolveQuery(unsigned char* recvBuf, unsigned char* sendBuf, int recv
 		addrCli:	&新的目标地址
 	return:			int	---- 最终写入到sendBuf的字节数
 */
-extern int ResolveResponse(unsigned char* recvBuf, unsigned char* sendBuf, int recvByte,SOCKADDR_IN*addrCli);
+extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte,SOCKADDR_IN*addrCli);
