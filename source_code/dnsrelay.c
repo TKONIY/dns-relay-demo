@@ -61,10 +61,10 @@ int main(int argc, char* argv[]) {
 	} else printf("Bind() is OK!\n");
 
 	/* 打印 socket 信息 */
-	getsockname(sockSrv, (SOCKADDR*)&addrSrv, (int*)sizeof(addrSrv));
-	printf("Server: Receiving IP(s) used : % s\n", inet_ntop(AF_INET, (void*)&addrSrv.sin_addr, ipStrBuf, 16));
-	printf("Server: Receiving port used : % d\n", htons(addrSrv.sin_port));
-	printf("Server: I\'m ready to receive a datagram...\n");
+	//getsockname(sockSrv, (SOCKADDR*)&addrSrv, (int*)sizeof(addrSrv));
+	//printf("Server: Receiving IP(s) used : % s\n", inet_ntop(AF_INET, (void*)&addrSrv.sin_addr, ipStrBuf, 16));
+	//printf("Server: Receiving port used : % d\n", htons(addrSrv.sin_port));
+	//printf("Server: I\'m ready to receive a datagram...\n");
 
 	InitCTable();/*初始化clientTable为空队列*/
 
@@ -81,6 +81,7 @@ int main(int argc, char* argv[]) {
 
 			/*清空buffer*/
 			ClearBuffer(recvBuf, recvByte); 
+			ClearBuffer(sendBuf, sendByte);
 
 			/*接收报文*/
 			printf("datagram arrived. Recieving...\n");
@@ -147,4 +148,6 @@ int main(int argc, char* argv[]) {
 	else
 		printf("clean up is OK.\n");
 
+
+	return 0;
 }

@@ -6,7 +6,7 @@
 #include"control.h"
 
 /*可以使用database的所有接口,以及control中定义的宏*/
-extern char addrDNSserv[];/*外部变量,理应为char*,可修改*/
+extern const char addrDNSserv[];/*外部变量,理应为char*,可修改*/
 
 
 /*

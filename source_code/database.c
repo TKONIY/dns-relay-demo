@@ -89,7 +89,7 @@ int GetCTableFrontIndex() {
 static sqlite3* db = NULL;  /*数据库对象*/
 
 /*封装INSERT接口*/
-int DNSInsert(sqlite3* db, const char* ip, const char* name) {
+static int DNSInsert(sqlite3* db, const char* ip, const char* name) {
 	/*char sql_insert[512] = "INSERT INTO DNS_record (IP, Name) VALUES('";
 	strcat(sql_insert, ip);
 	strcat(sql_insert, "', '");
@@ -107,7 +107,7 @@ int DNSInsert(sqlite3* db, const char* ip, const char* name) {
 }
 
 /*封装SELECT接口*/
-int DNSSelect(sqlite3* db, const char* name, char* ip) {
+static int DNSSelect(sqlite3* db, const char* name, char* ip) {
 	/*char sql_select[512] = "SELECT IP FROM DNS_record WHERE Name = '";
 	strcat(sql_select, name);
 	strcat(sql_select, "';");*/
@@ -149,13 +149,13 @@ int DNSSelect(sqlite3* db, const char* name, char* ip) {
 }
 
 /*封装从文件中读取接口*/
-int DNSImport(sqlite3* db, const char* fname) {
+static int DNSImport(sqlite3* db, const char* fname) {
 	FILE* fp = fopen(fname, "r");
 	if (!fp) { //空
 		printf("Can't open dnsrealay.txt %s\n", fname);
 		return SQLITE_FAIL;
 	} else {
-		char ip[15] = { '\0' };
+		char ip[16] = { '\0' };
 		char name[100] = { '\0' };
 		while (!feof(fp))
 		{
