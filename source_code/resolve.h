@@ -6,8 +6,6 @@
 #include"control.h"
 
 /*可以使用database的所有接口,以及control中定义的宏*/
-extern const char addrDNSserv[];/*外部变量,理应为char*,可修改*/
-
 
 /*
 	Discription:	DNS头部结构体,12字节

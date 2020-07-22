@@ -118,7 +118,7 @@ static int DNSSelect(sqlite3* db, const char* name, char* ip) {
 		"FROM DNS_record "
 		"WHERE Name = '%s';",
 		name);
-	printf("%s", sql_select);
+	printf("%s\n", sql_select);
 	/*"SELECT IP"
 	"FROM DNS_record"
 	"WHERE Name = 'canteencloud.com';";*/
@@ -164,7 +164,7 @@ static int DNSImport(sqlite3* db, const char* fname) {
 
 			/*insert to db, 不判断结果了*/
 			DNSInsert(db, ip, name);
-			printf("imported %s %s\n", ip, name);
+			//printf("imported %s %s\n", ip, name);
 		}
 		fclose(fp);
 		return SQLITE_OK;
@@ -175,10 +175,10 @@ static int DNSImport(sqlite3* db, const char* fname) {
 char BuildDNSDatabase()
 {
 	/*创建数据库*/
-	if (SQLITE_OK == sqlite3_open("dnsrelay.db", &db)) {
-		printf("Opened.\n");
+	if (SQLITE_OK == sqlite3_open(gDBsqlite, &db)) {
+		printf("Database %s opened.\n", gDBsqlite);
 	} else {
-		printf("Failed to open .\n");
+		printf("Failed to open %s.\n",gDBsqlite);
 		return 0;
 	}
 	/*删除表*/
@@ -189,17 +189,18 @@ char BuildDNSDatabase()
 		"IP   varchar(16)  NOT NULL,"
 		"Name varchar(100) NOT NULL);";
 	if (SQLITE_OK == sqlite3_exec(db, sql_create, NULL, NULL, NULL)) {
-		printf("successfully created.\n");
+		printf("successfully created %s.\n", gDBsqlite);
 	} else {
-		printf("falied to created\n");
+		printf("falied to created sqlite database.\n");
 		return 0;
 	}
 
 	/*导入表*/
+	printf("importing records from %s to %s\n", gDBtxt, gDBsqlite);
 	if (SQLITE_OK == DNSImport(db, "dnsrelay.txt")) {
-		printf("successfully read\n");
+		printf("successfully import\n");
 	} else {
-		printf("failed to read.");
+		printf("failed to import.\n");
 		return 0;
 	}
 	return 1;

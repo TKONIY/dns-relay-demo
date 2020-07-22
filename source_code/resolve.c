@@ -1,6 +1,5 @@
 #include "resolve.h"
 
-const char addrDNSserv[] = "202.106.0.20"; /*定义*/
 
 /*
 	Description:	字段中域名(n)与数据库中域名(p)的相互转换(参考网络序->主机序的命名)
@@ -19,7 +18,7 @@ static char domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 	while (pName[i]) {						/*遍历到0时结束*/
 		int offset = pName[i];				/*下一段的长度*/
 		pName[i] = '.';						/*分隔*/
-		printf("i=%d\n", i);
+		//printf("i=%d\n", i);				/*调试用*/
 		i += offset+1;						/*跳到下一个分隔处*/
 	}
 	return 1;

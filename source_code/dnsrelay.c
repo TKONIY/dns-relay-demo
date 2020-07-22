@@ -9,11 +9,21 @@
 
 int main(int argc, char* argv[]) {
 
+	if (dealOpts(argc, argv)) { /*成功获取参数*/
+		printf("Debug level %d\n", gDebugLevel);
+		printf("Name server %s:53\n", addrDNSserv);
+		printf("Database using %s\n", gDBtxt);
+	} else {					/*获取参数失败*/
+		printf("Please use the following format:\n"
+			"dnsrelay [-d|-dd] [dns-server-ipaddr] [filename]");
+		return 0;
+	}
+
 	if (!BuildDNSDatabase()) {
 		printf("Failed to build the database.\n");
 		return 0;
 	}
-	
+
 	WSADATA wsaData;								/*协议版本信息*/
 	SOCKADDR_IN addrSrv;							/*服务端(dnsrelay)地址*/
 	SOCKADDR_IN addrCli;							/*客户端地址*/
@@ -25,7 +35,7 @@ int main(int argc, char* argv[]) {
 	unsigned char sendBuf[MAX_BUFSIZE] = { '\0' };	/*发送缓冲*/
 	int recvByte = 0;								/*recvBuf存放的报文大小*/
 	int sendByte = 0;								/*sendBuf存放的报文大小*/
-	
+
 
 	/* 获取socket版本2.2 */
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -80,7 +90,7 @@ int main(int argc, char* argv[]) {
 		case dgram_arrival:
 
 			/*清空buffer*/
-			ClearBuffer(recvBuf, recvByte); 
+			ClearBuffer(recvBuf, recvByte);
 			ClearBuffer(sendBuf, sendByte);
 
 			/*接收报文*/
@@ -96,8 +106,12 @@ int main(int argc, char* argv[]) {
 			/*判断接收的是response还是query,更新报文sendBuf,更新发送目标addrCli(不一定是客户端,也可能是DNS服务器*/
 			if ((recvBuf[2] & 0x80) >> 7 == 0) {
 				printf("收到一个请求报文。内容如下:\n");
-				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
+				DebugBuffer(recvBuf, recvByte);	/*打印buffer--debug*/
 				sendByte = ResolveQuery(recvBuf, sendBuf, recvByte, &addrCli);
+				if (sendByte < 0) { /*处理query失败*/
+					printf("failed to solved query.\n");
+					break;
+				}
 			} else {
 				printf("收到一个响应报文。内容如下:\n");
 				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
@@ -106,8 +120,8 @@ int main(int argc, char* argv[]) {
 			}
 
 			/*发送报文*/
-			printf("datagram sending to %s:%d\n", 
-				inet_ntop(AF_INET, (void*)&addrCli.sin_addr, ipStrBuf, 16), 
+			printf("datagram sending to %s:%d\n",
+				inet_ntop(AF_INET, (void*)&addrCli.sin_addr, ipStrBuf, 16),
 				htons(addrCli.sin_port)
 			);
 			addrCliSize = sizeof(addrCli);

@@ -2,8 +2,9 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <string.h>
+#include <control.h>
+#include "control.h"
 
-#define MAX_QUERIES 1000 /*最大支持的同时等待的用户query数*/
 
 typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 /*
