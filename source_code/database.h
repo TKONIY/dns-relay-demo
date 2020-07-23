@@ -10,15 +10,13 @@ typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 /*
 	Discription:			存放用户query记录的结构
 	Attributes:
-		SOCKADDR_IN addrReq 用来记录发出请求的client地址
 		SOCKADDR_IN addr	socket地址
 		DNSID originId		用户发送的DNS报文的ID
 		unsigned char r;	表示这个是否被reply了
 */
 
 typedef struct clientRecord{
-	SOCKADDR_IN addrReq;
-	SOCKADDR addr;
+	SOCKADDR_IN addr;
 	DNSID originId;
 	unsigned char r;
 }CRecord;
@@ -61,7 +59,7 @@ extern void DebugCTable();
 	Return:				
 		char			0/1表示是否成功
 */
-extern char PushCRecord(const SOCKADDR* pAddr, DNSID *pId);
+extern char PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
 
 /*
 	Discription:		将队首记录弹出

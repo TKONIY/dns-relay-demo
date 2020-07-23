@@ -28,7 +28,6 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 	char ip[16] = { '\0' };						/*存放ip*/
 	char domainName[100] = { '\0' };			/*存放域名*/
 	domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
-
 	if (FindInDNSDatabase(domainName, ip)) {	/*如果找到记录*/
 
 		memcpy(sendBuf, recvBuf, recvByte);		/*将接收内容复制到发送缓冲*/
@@ -53,7 +52,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		DNSHeader* header = (DNSHeader*)recvBuf;
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
-		if (PushCRecord((SOCKADDR*)addrCli,&newID,addrCli)) {/*如果成功加入队列*/
+		if (PushCRecord(addrCli, &newID)) {/*如果成功加入队列*/
 			/*填写发送缓冲*/
 			memcpy(sendBuf, recvBuf, recvByte);
 			/*更新转发ID*/
@@ -88,7 +87,7 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 		//printf("orignID is %x\n", htons(pRecord->originId)); Debug语句便于区分我用//注释了
 		/*发送地址族IPv4,地址及端口:从CRecord中获取当前ID对应的源地址及端口*/
 		addrCli->sin_family = AF_INET;
-		addrCli->sin_port = pRecord->addrReq.sin_port;
+		addrCli->sin_port = pRecord->addr.sin_port;
 		inet_pton(AF_INET, addrDNSclie, &addrCli->sin_addr);
 		//printf("address: %x\n", addrCli->sin_addr);
 		return recvByte;
