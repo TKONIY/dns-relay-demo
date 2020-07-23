@@ -53,7 +53,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		DNSHeader* header = (DNSHeader*)recvBuf;
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
-		if (PushCRecord((SOCKADDR*)addrCli,&newID)) {/*如果成功加入队列*/
+		if (PushCRecord((SOCKADDR*)addrCli,&newID,addrCli)) {/*如果成功加入队列*/
 			/*填写发送缓冲*/
 			memcpy(sendBuf, recvBuf, recvByte);
 			/*更新转发ID*/
@@ -71,5 +71,29 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 }
 
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
-	return recvByte;
+	unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
+	/*FindCRecord要用到的两个参数*/
+	DNSHeader* header = (DNSHeader*)recvBuf;
+	CRecord* pRecord = (CRecord*)recvBuf;
+	printf("收到ID为%x的响应报文\n", ntohs(header->ID));
+	/*外部DNS给出的ID是newID，FindCRecord前记录Buf*/
+	DNSID newID = ntohs(header->ID);
+	memcpy(tempBuf, recvBuf, recvByte);
+
+	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/
+		memcpy(sendBuf, tempBuf, recvByte);       /*接受内容复制到发送缓存*/
+		/*将newID换成originID*/
+		header = (DNSHeader*)sendBuf;			  
+		header->ID = htons(pRecord->originId);
+		//printf("orignID is %x\n", htons(pRecord->originId)); Debug语句便于区分我用//注释了
+		/*发送地址族IPv4,地址及端口:从CRecord中获取当前ID对应的源地址及端口*/
+		addrCli->sin_family = AF_INET;
+		addrCli->sin_port = pRecord->addrReq.sin_port;
+		inet_pton(AF_INET, addrDNSclie, &addrCli->sin_addr);
+		//printf("address: %x\n", addrCli->sin_addr);
+		return recvByte;
+	}
+	else {
+		return -1;
+	}
 }

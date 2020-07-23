@@ -116,7 +116,10 @@ int main(int argc, char* argv[]) {
 				printf("收到一个响应报文。内容如下:\n");
 				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
 				sendByte = ResolveResponse(recvBuf, sendBuf, recvByte, &addrCli);
-				break;/*暂时先不考虑收到响应的情况*/
+				if (sendByte < 0) { /*处理response失败*/
+					printf("failed to solved response.\n");
+					break;
+				}
 			}
 
 			/*发送报文*/

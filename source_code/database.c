@@ -19,7 +19,7 @@ void DebugCTable() {
 	printf("队列最大缓存%d 已使用%d\n", MAX_QUERIES, used);
 }
 
-char PushCRecord(const SOCKADDR* pAddr, DNSID* pId) {
+char PushCRecord(const SOCKADDR* pAddr, DNSID* pId, SOCKADDR_IN* rAddr) {
 	if ((clientTable.rear + 1) % MAX_QUERIES == clientTable.front) {
 		printf("队列已满,丢弃报文\n.");
 		return 0;
@@ -27,6 +27,7 @@ char PushCRecord(const SOCKADDR* pAddr, DNSID* pId) {
 		clientTable.base[clientTable.rear].addr = *pAddr;
 		clientTable.base[clientTable.rear].originId = *pId;
 		clientTable.base[clientTable.rear].r = 0;
+		clientTable.base[clientTable.rear].addrReq = *rAddr; /*获取发出请求的客户端地址*/
 		*pId = clientTable.rear;/*获取新的ID*/
 		clientTable.rear = (clientTable.rear + 1) % MAX_QUERIES;
 		return 1;
