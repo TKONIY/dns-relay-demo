@@ -19,6 +19,7 @@ typedef struct clientRecord{
 	SOCKADDR_IN addr;
 	DNSID originId;
 	unsigned char r;
+	int expireTime;
 }CRecord;
 
 /*
@@ -107,6 +108,29 @@ extern int GetCTableRearIndex();
 */
 extern int GetCTableFrontIndex();
 
+/*
+	Discription:		队首元素是否回复
+	Params:
+	Return:
+		int				0/1表示是否回复过
+*/
+extern int GetCTableFrontIndex_r();
+
+/*
+	Discription:		队首元素是否超时
+	Params:
+	Return:
+		int				0/1表示是否超时
+*/
+extern int CheckExpired();
+
+/*
+	Discription:		设置超时时间
+	Params:
+	Return:
+		int				默认3秒
+*/
+extern int SetTime();
 
 /******************DNSTable系列方法***********************/
 

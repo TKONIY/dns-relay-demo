@@ -79,7 +79,13 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	DNSID newID = ntohs(header->ID);
 	memcpy(tempBuf, recvBuf, recvByte);
 
-	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/
+	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/	
+		if (pRecord->r == 0) {
+			SetCRecordR(newID); /*未回复则回复并把r置为1*/
+			//printf("ID为 %hu 的报文已经回复\n", newID);
+		}else {
+			return -1; /*回复过就不做操作*/
+		}
 		memcpy(sendBuf, tempBuf, recvByte);       /*接受内容复制到发送缓存*/
 		/*将newID换成originID*/
 		header = (DNSHeader*)sendBuf;			  

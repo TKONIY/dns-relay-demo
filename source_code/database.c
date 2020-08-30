@@ -27,6 +27,7 @@ char PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
 		clientTable.base[clientTable.rear].addr = *pAddr;
 		clientTable.base[clientTable.rear].originId = *pId;
 		clientTable.base[clientTable.rear].r = 0;
+		clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
 		//clientTable.base[clientTable.rear].addrReq = *rAddr; /*获取发出请求的客户端地址*/
 		*pId = clientTable.rear;/*获取新的ID*/
 		clientTable.rear = (clientTable.rear + 1) % MAX_QUERIES;
@@ -85,6 +86,19 @@ int GetCTableFrontIndex() {
 	return clientTable.front;
 }
 
+int GetCTableFrontIndex_r() {
+	return clientTable.base[clientTable.front].r;
+}
+
+int CheckExpired() {
+	/*判断是否超时*/
+	return clientTable.base[clientTable.front].expireTime > 0 && 
+		   time(NULL) > clientTable.base[clientTable.front].expireTime;
+}
+
+int SetTime() {
+	clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
+}
 /*******************SQLite封装*******************************/
 
 static sqlite3* db = NULL;  /*数据库对象*/
