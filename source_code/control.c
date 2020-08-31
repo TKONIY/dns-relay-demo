@@ -4,10 +4,10 @@
 
 #include "control.h"
 
-static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; //空buffer
+static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; /*空buffer*/
 
-//extern const char* gDefaultDBtxt = "dnsrelay.txt";	
-//extern const char* gDefaultDBsqlite = "dnsrelay.db";
+/*extern const char* gDefaultDBtxt = "dnsrelay.txt";*/	
+/*extern const char* gDefaultDBsqlite = "dnsrelay.db";*/
 char gDBtxt[100] = "dnsrelay.txt";
 char gDBsqlite[100] = "dnsrelay.db";
 char addrDNSserv[16] = "202.106.0.20"; 
@@ -48,7 +48,7 @@ void ClearBuffer(unsigned char* buf, int bufSize) {
 		printf("ClearBuffer() failed, bufSize error: %d\n", bufSize);
 	else
 		memset(buf, 0, bufSize);
-		//memcpy(buf,emptyBuffer, bufSize);
+		/*memcpy(buf,emptyBuffer, bufSize);*/
 }
 
 extern char dealOpts(int argc, char* argv[]) {
@@ -58,11 +58,11 @@ extern char dealOpts(int argc, char* argv[]) {
 
 	/*获取调试级别*/
 	if (!strcmp(argv[i], "-dd")) {
-		//printf("使用调试级别2\n");
+		/*printf("使用调试级别2\n");*/
 		gDebugLevel = 2;
 		++i;
 	} else if (!strcmp(argv[i], "-d")) {
-		//printf("使用调试级别1\n");
+		/*printf("使用调试级别1\n");*/
 		gDebugLevel = 1;
 		++i;
 	}
@@ -90,7 +90,7 @@ extern char dealOpts(int argc, char* argv[]) {
 			if (!zeroValid) { addrDNSserv[stri++] = '0'; }	/*对于0的数，补充一个0*/
 		}
 		addrDNSserv[stri] = '\0';
-		//printf("DNS server ip: %s\n", addrDNSserv);
+		/*printf("DNS server ip: %s\n", addrDNSserv);*/
 		++i; /*下一个命令行参数*/
 	}
 
@@ -99,7 +99,7 @@ extern char dealOpts(int argc, char* argv[]) {
 	/*获取数据库txt文件的名字*/
 	if (!strcmp(argv[i] + strlen(argv[i]) - 4, ".txt")) {
 		strcpy(gDBtxt, argv[i]);
-		//printf("fileName: %s\n", argv[i]);
+		/*printf("fileName: %s\n", argv[i]);*/
 		++i;
 	}
 

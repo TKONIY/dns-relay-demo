@@ -125,7 +125,7 @@ extern int GetCTableFrontIndex_r();
 extern int CheckExpired();
 
 /*
-	Discription:		设置超时时间
+	Discription:		给当前队首元素设置新超时时间
 	Params:
 	Return:
 		int				默认3秒
