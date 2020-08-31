@@ -191,9 +191,9 @@ static FILE* dbTXT = NULL;		/*文本数据库对象*/
 
 /*封装从文本中查询IP接口*/
 static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
+	char retName[100] = { '\0' };
 	while (!feof(dbTXT)) {
-		char retName[100] = { '\0' };
-		fscanf_s(dbTXT, "%s %s", ip, retName);
+		fscanf(dbTXT, "%s %s", ip, retName);
 		if (!strcmp(retName, name))break;
 	}
 	if (feof(dbTXT))return 0;/*文件结束,未找到*/

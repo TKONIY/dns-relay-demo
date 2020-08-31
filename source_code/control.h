@@ -5,7 +5,7 @@
 
 
 /* 全局配置 */
-#define MAX_QUERIES 5			/*最大支持的同时等待的用户query数*/
+#define MAX_QUERIES 500			/*最大支持的同时等待的用户query数*/
 #define MAX_BUFSIZE 512				/*UDP最大载荷*/
 typedef enum { dgram_arrival, timeout } event_type; /*事件类型*/
 /*extern const char* gDefaultDBtxt;*/	/*默认txt格式的数据库文件*/
