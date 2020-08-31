@@ -18,7 +18,7 @@ static char domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 	while (pName[i]) {						/*遍历到0时结束*/
 		int offset = pName[i];				/*下一段的长度*/
 		pName[i] = '.';						/*分隔*/
-		//printf("i=%d\n", i);				/*调试用*/
+		/*printf("i=%d\n", i);*/			/*调试用*/
 		i += offset+1;						/*跳到下一个分隔处*/
 	}
 	return 1;
@@ -82,7 +82,7 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/	
 		if (pRecord->r == 0) {
 			SetCRecordR(newID); /*未回复则回复并把r置为1*/
-			//printf("ID为 %hu 的报文已经回复\n", newID);
+			/*printf("ID为 %hu 的报文已经回复\n", newID);*/
 		}else {
 			return -1; /*回复过就不做操作*/
 		}
@@ -90,12 +90,12 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 		/*将newID换成originID*/
 		header = (DNSHeader*)sendBuf;			  
 		header->ID = htons(pRecord->originId);
-		//printf("orignID is %x\n", htons(pRecord->originId)); Debug语句便于区分我用//注释了
+		/*printf("orignID is %x\n", htons(pRecord->originId)); */
 		/*发送地址族IPv4,地址及端口:从CRecord中获取当前ID对应的源地址及端口*/
 		addrCli->sin_family = AF_INET;
 		addrCli->sin_port = pRecord->addr.sin_port;
 		inet_pton(AF_INET, addrDNSclie, &addrCli->sin_addr);
-		//printf("address: %x\n", addrCli->sin_addr);
+		/*printf("address: %x\n", addrCli->sin_addr);*/
 		return recvByte;
 	}
 	else {

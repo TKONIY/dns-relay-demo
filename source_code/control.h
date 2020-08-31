@@ -5,11 +5,11 @@
 
 
 /* 全局配置 */
-#define MAX_QUERIES 1000			/*最大支持的同时等待的用户query数*/
+#define MAX_QUERIES 5			/*最大支持的同时等待的用户query数*/
 #define MAX_BUFSIZE 512				/*UDP最大载荷*/
 typedef enum { dgram_arrival, timeout } event_type; /*事件类型*/
-//extern const char* gDefaultDBtxt;	/*默认txt格式的数据库文件*/
-//extern const char* gDefaultDBsqlite;/*默认sqlite3数据库文件*/
+/*extern const char* gDefaultDBtxt;*/	/*默认txt格式的数据库文件*/
+/*extern const char* gDefaultDBsqlite;*//*默认sqlite3数据库文件*/
 extern char gDBtxt[100];			/*用户指定的txt数据库文件名*/
 extern char addrDNSserv[16];		/*DNS服务器地址*/
 extern char addrDNSclie[16];		/*127.0.0.1*/

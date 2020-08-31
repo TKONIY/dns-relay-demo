@@ -71,29 +71,17 @@ int main(int argc, char* argv[]) {
 	} else printf("Bind() is OK!\n");
 
 	/* 打印 socket 信息 */
-	//getsockname(sockSrv, (SOCKADDR*)&addrSrv, (int*)sizeof(addrSrv));
-	//printf("Server: Receiving IP(s) used : % s\n", inet_ntop(AF_INET, (void*)&addrSrv.sin_addr, ipStrBuf, 16));
-	//printf("Server: Receiving port used : % d\n", htons(addrSrv.sin_port));
-	//printf("Server: I\'m ready to receive a datagram...\n");
+	/*getsockname(sockSrv, (SOCKADDR*)&addrSrv, (int*)sizeof(addrSrv));*/
+	/*printf("Server: Receiving IP(s) used : % s\n", inet_ntop(AF_INET, (void*)&addrSrv.sin_addr, ipStrBuf, 16));*/
+	/*printf("Server: Receiving port used : % d\n", htons(addrSrv.sin_port));*/
+	/*printf("Server: I\'m ready to receive a datagram...\n");*/
 
 	InitCTable();/*初始化clientTable为空队列*/
 
 	/* 开始无尽的循环, 按下 Esc 退出循环 */
 	while (!(_kbhit() && _getch() == 27)) {
 
-		if (GetCTableFrontIndex_r() == 1){ /*若已经回复过，POP*/
-			PopCRecord();
-		}	/*是不是应该改成while*/
 
-		if (CheckExpired()) {  /*若检测超时， POP出去加到队尾，并重新设置超时时间*/
-			PopCRecord();
-			SetTime();
-		}
-
-		/*
-			1 2 3 4 5 6 7 8
-			c h c h
-		*/
 		event = WaitForEvent();
 		switch (event)
 		{
