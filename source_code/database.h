@@ -13,6 +13,7 @@ typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 		SOCKADDR_IN addr	socket地址
 		DNSID originId		用户发送的DNS报文的ID
 		unsigned char r;	表示这个是否被reply了
+		expireTime	?
 */
 
 typedef struct clientRecord{

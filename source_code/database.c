@@ -101,7 +101,7 @@ int SetTime() {
 }
 /*******************SQLite封装*******************************/
 
-static sqlite3* db = NULL;  /*数据库对象*/
+//static sqlite3* db = NULL;  /*数据库对象*/
 
 /*封装INSERT接口*/
 static int DNSInsert(sqlite3* db, const char* ip, const char* name) {
@@ -186,49 +186,79 @@ static int DNSImport(sqlite3* db, const char* fname) {
 	}
 }
 
+/*******************dnsrelay.txt文本数据库封装****************/
+static FILE* dbTXT = NULL;		/*文本数据库对象*/
+
+/*封装从文本中查询IP接口*/
+static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
+	while (!feof(dbTXT)) {
+		char retName[100] = { '\0' };
+		fscanf_s(dbTXT, "%s %s", ip, retName);
+		if (!strcmp(retName, name))break;
+	}
+	if (feof(dbTXT))return 0;/*文件结束,未找到*/
+	return 1;
+}
+
+/************************统一的数据库接口**********************/
 
 char BuildDNSDatabase()
 {
-	/*创建数据库*/
-	if (SQLITE_OK == sqlite3_open(gDBsqlite, &db)) {
-		printf("Database %s opened.\n", gDBsqlite);
-	} else {
-		printf("Failed to open %s.\n",gDBsqlite);
-		return 0;
-	}
-	/*删除表*/
-	const char* sql_drop = "DROP TABLE DNS_record;";
-	sqlite3_exec(db, sql_drop, NULL, NULL,NULL);
-	/*创建表*/
-	const char* sql_create = "CREATE TABLE DNS_record("
-		"IP   varchar(16)  NOT NULL,"
-		"Name varchar(100) NOT NULL);";
-	if (SQLITE_OK == sqlite3_exec(db, sql_create, NULL, NULL, NULL)) {
-		printf("successfully created %s.\n", gDBsqlite);
-	} else {
-		printf("falied to created sqlite database.\n");
-		return 0;
-	}
-
-	/*导入表*/
-	printf("importing records from %s to %s\n", gDBtxt, gDBsqlite);
-	if (SQLITE_OK == DNSImport(db, "dnsrelay.txt")) {
-		printf("successfully import\n");
-	} else {
-		printf("failed to import.\n");
-		return 0;
-	}
+	/*打开文本文件*/
+	dbTXT = fopen("dnsrelay.txt", "r");
+	if (!dbTXT)return 0;
 	return 1;
+
+	///*创建数据库*/
+	//if (SQLITE_OK == sqlite3_open(gDBsqlite, &db)) {
+	//	printf("Database %s opened.\n", gDBsqlite);
+	//} else {
+	//	printf("Failed to open %s.\n",gDBsqlite);
+	//	return 0;
+	//}
+	///*删除表*/
+	//const char* sql_drop = "DROP TABLE DNS_record;";
+	//sqlite3_exec(db, sql_drop, NULL, NULL,NULL);
+	///*创建表*/
+	//const char* sql_create = "CREATE TABLE DNS_record("
+	//	"IP   varchar(16)  NOT NULL,"
+	//	"Name varchar(100) NOT NULL);";
+	//if (SQLITE_OK == sqlite3_exec(db, sql_create, NULL, NULL, NULL)) {
+	//	printf("successfully created %s.\n", gDBsqlite);
+	//} else {
+	//	printf("falied to created sqlite database.\n");
+	//	return 0;
+	//}
+
+	///*导入表*/
+	//printf("importing records from %s to %s\n", gDBtxt, gDBsqlite);
+	//if (SQLITE_OK == DNSImport(db, "dnsrelay.txt")) {
+	//	printf("successfully import\n");
+	//} else {
+	//	printf("failed to import.\n");
+	//	return 0;
+	//}
+	//return 1;
+
+
+	
 }
 
 char FindInDNSDatabase(const char* domainName,char*ip)
 {
-	if (db && SQLITE_OK == DNSSelect(db, domainName, ip)) { 
-		/*db不为空且找到了对应记录*/
-		return 1;
+	//if (db && SQLITE_OK == DNSSelect(db, domainName, ip)) { 
+	//	/*db不为空且找到了对应记录*/
+	//	return 1;
+	//} else {
+	//	return 0;
+	//}
+
+	if (dbTXT && FindIPByDNSinTXT(dbTXT, domainName, ip)) {
+		return 1; /*db存在且找到了对应记录*/
 	} else {
 		return 0;
 	}
+
 }
 
 

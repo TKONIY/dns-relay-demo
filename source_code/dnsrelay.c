@@ -83,12 +83,17 @@ int main(int argc, char* argv[]) {
 
 		if (GetCTableFrontIndex_r() == 1){ /*若已经回复过，POP*/
 			PopCRecord();
-		}
+		}	/*是不是应该改成while*/
 
 		if (CheckExpired()) {  /*若检测超时， POP出去加到队尾，并重新设置超时时间*/
 			PopCRecord();
 			SetTime();
 		}
+
+		/*
+			1 2 3 4 5 6 7 8
+			c h c h
+		*/
 		event = WaitForEvent();
 		switch (event)
 		{
