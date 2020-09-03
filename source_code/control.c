@@ -16,9 +16,8 @@ int gDebugLevel = 0;
 
 
 event_type WaitForEvent() {
-
+	UpdateCache(); /*更新cache*/
 	return dgram_arrival;
-	
 }
 
 
@@ -51,7 +50,7 @@ void ClearBuffer(unsigned char* buf, int bufSize) {
 		/*memcpy(buf,emptyBuffer, bufSize);*/
 }
 
-extern char dealOpts(int argc, char* argv[]) {
+extern int dealOpts(int argc, char* argv[]) {
 	int i = 1;/*从第1个参数开始*/
 
 	if (i >= argc)return 1;	/*识别结束,正确*/

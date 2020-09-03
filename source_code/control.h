@@ -2,11 +2,14 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
-
+#include "database.h"
 
 /* 全局配置 */
-#define MAX_QUERIES 500			/*最大支持的同时等待的用户query数*/
+
 #define MAX_BUFSIZE 512				/*UDP最大载荷*/
+#define MAX_IP_BUFSIZE 16			/*IP的最大长度*/
+#define MAX_DOMAINNAME 100			/*域名的最大长度*/
+#define TTL 120						/*TTL的初始值*/
 typedef enum { dgram_arrival, timeout } event_type; /*事件类型*/
 /*extern const char* gDefaultDBtxt;*/	/*默认txt格式的数据库文件*/
 /*extern const char* gDefaultDBsqlite;*//*默认sqlite3数据库文件*/
@@ -15,7 +18,6 @@ extern char addrDNSserv[16];		/*DNS服务器地址*/
 extern char addrDNSclie[16];		/*127.0.0.1*/
 extern char gDBsqlite[100];			/*sqlite数据库名字*/
 int gDebugLevel;					/*调试等级*/
-
 
 
 /*
@@ -63,4 +65,4 @@ extern void ClearBuffer(unsigned char* buf, int bufSize);
 		1			符合格式
 		0			不符合格式
 */
-extern char dealOpts(int argc, char* argv[]);
+extern int dealOpts(int argc, char* argv[]);

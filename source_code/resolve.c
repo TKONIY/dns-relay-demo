@@ -10,7 +10,7 @@
 		0			失败
 		1			成功
 */
-static char domainName_ntop(const unsigned char* nName, unsigned char* pName) {
+static int domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 	/*第一个字符不要*/
 	
 	memcpy(pName, nName+1, strlen((char*)nName));/*网络域名也以\0结束,可以使用strlen*/
@@ -26,7 +26,7 @@ static char domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 
 extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	char ip[16] = { '\0' };						/*存放ip*/
-	char domainName[100] = { '\0' };			/*存放域名*/
+	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
 	domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
 	if (FindInDNSDatabase(domainName, ip)) {	/*如果找到记录*/
 
@@ -73,11 +73,16 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
 	/*FindCRecord要用到的两个参数*/
 	DNSHeader* header = (DNSHeader*)recvBuf;
-	CRecord* pRecord = (CRecord*)recvBuf;
+	CRecord* pRecord = (CRecord*)recvBuf;	/*TODO!!! 什么鬼, 快改掉,*/
 	printf("收到ID为%x的响应报文\n", ntohs(header->ID));
 	/*外部DNS给出的ID是newID，FindCRecord前记录Buf*/
-	DNSID newID = ntohs(header->ID);
+	DNSID newID = ntohs(header->ID);		
 	memcpy(tempBuf, recvBuf, recvByte);
+
+	/*TODO*/
+	/*
+		把查询到的结果更新到cache, 需要从DNS报文中获取TTL, 域名, IP;
+	*/
 
 	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/	
 		if (pRecord->r == 0) {

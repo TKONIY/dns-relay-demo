@@ -2,9 +2,10 @@
 #include <stdio.h>
 #include <winsock2.h>
 #include <string.h>
-#include <control.h>
 #include "control.h"
 
+#define MAX_QUERIES 500				/*最大支持的同时等待的用户query数*/
+#define MAX_CACHE_SIZE 100		/*dns缓存的容量*/
 
 typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 /*
@@ -16,7 +17,7 @@ typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
 		expireTime	?
 */
 
-typedef struct clientRecord{
+typedef struct {
 	SOCKADDR_IN addr;
 	DNSID originId;
 	unsigned char r;
@@ -35,7 +36,6 @@ typedef struct {
 	int front;
 	int rear;
 }CQueue;
-
 
 /********************ClientTable系列方法******************/
 
@@ -61,7 +61,7 @@ extern void DebugCTable();
 	Return:				
 		char			0/1表示是否成功
 */
-extern char PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
+extern int PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
 
 /*
 	Discription:		将队首记录弹出
@@ -70,7 +70,7 @@ extern char PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
 	Return:
 		char			0/1表示是否成功
 */
-extern char PopCRecord();
+extern int PopCRecord();
 
 
 /*
@@ -80,17 +80,17 @@ extern char PopCRecord();
 	Return:
 		char			0/1表示是否成功
 */
-extern char SetCRecordR(DNSID id);
+extern int SetCRecordR(DNSID id);
 
 /*
 	Discription:		根据转发ID查找原ID和地址
 	Params:
 		DNSID id;			id
-		CRecord* pRecord	存放record的地址
+		CRecord* pRecord	存放record的地址 传出参数
 	Return
 		char				0/1表示是否成功。
 */
-extern char FindCRecord(DNSID id, CRecord* pRecord);
+extern int FindCRecord(DNSID id, CRecord* pRecord);
 
 /*
 	Discription:		获取队尾元素的序号
@@ -142,7 +142,7 @@ extern int SetTime();
 		char 0 失败
 		char 1 成功
 */
-extern char BuildDNSDatabase();
+extern int BuildDNSDatabase();
 
 /*
 	Discription:	在DNS中查找域名
@@ -154,7 +154,28 @@ extern char BuildDNSDatabase();
 		0: 没找到
 		1: 找到了
 */
-extern char FindInDNSDatabase(const char* domainName, char*ip);
+extern int FindInDNSDatabase(const char* domainName, char*ip);
 
 
 /******************DNSCache系列方法***********************/
+
+
+
+/*
+	Discription:	添加记录到DNSCache
+	Params:
+		domainName	域名
+		ip			ip地址，返回值,请保证至少有16字节的空间(15个字符+\0)
+		ttl			当前的ttl
+
+	Return:
+		0: 没找到
+		1: 找到了
+*/
+extern int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl);
+
+/*
+	Discription:	更新DNS cache里面的TTL和删除过期的DNS记录
+	Params:
+*/
+extern void UpdateCache();

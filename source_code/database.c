@@ -19,7 +19,7 @@ void DebugCTable() {
 	printf("队列最大缓存%d 已使用%d\n", MAX_QUERIES, used);
 }
 
-char PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
+int PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
 	if ((clientTable.rear + 1) % MAX_QUERIES == clientTable.front) {
 		printf("队列已满,丢弃报文\n.");
 		return 0;
@@ -35,7 +35,7 @@ char PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
 	}
 }
 
-char PopCRecord() {
+int PopCRecord() {
 	if (clientTable.rear == clientTable.front) {
 		printf("队列为空，PopCRecord()失败。\n");
 		return 0;
@@ -45,7 +45,7 @@ char PopCRecord() {
 	}
 }
 
-char SetCRecordR(DNSID id) {
+int SetCRecordR(DNSID id) {
 	if ((
 		clientTable.front <= clientTable.rear
 		&& (id < clientTable.rear && id >= clientTable.front)
@@ -61,7 +61,7 @@ char SetCRecordR(DNSID id) {
 	}
 }
 
-char FindCRecord(DNSID id, CRecord* pRecord) {
+int FindCRecord(DNSID id, CRecord* pRecord) {
 	if ((
 		clientTable.front <= clientTable.rear
 		&& (id < clientTable.rear && id >= clientTable.front)
@@ -92,8 +92,8 @@ int GetCTableFrontIndex_r() {
 
 int CheckExpired() {
 	/*判断是否超时*/
-	return clientTable.base[clientTable.front].expireTime > 0 && 
-		   time(NULL) > clientTable.base[clientTable.front].expireTime;
+	return clientTable.base[clientTable.front].expireTime > 0 &&
+		time(NULL) > clientTable.base[clientTable.front].expireTime;
 }
 
 int SetTime() {
@@ -170,8 +170,8 @@ static int DNSImport(sqlite3* db, const char* fname) {
 		printf("Can't open dnsrealay.txt %s\n", fname);
 		return SQLITE_FAIL;
 	} else {
-		char ip[16] = { '\0' };
-		char name[100] = { '\0' };
+		char ip[MAX_IP_BUFSIZE] = { '\0' };
+		char name[MAX_DOMAINNAME] = { '\0' };
 		while (!feof(fp))
 		{
 			fscanf(fp, "%s", ip);
@@ -191,7 +191,7 @@ static FILE* dbTXT = NULL;		/*文本数据库对象*/
 
 /*封装从文本中查询IP接口*/
 static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
-	char retName[100] = { '\0' };
+	char retName[MAX_DOMAINNAME] = { '\0' };
 	while (!feof(dbTXT)) {
 		fscanf(dbTXT, "%s %s", ip, retName);
 		if (!strcmp(retName, name))break;
@@ -202,7 +202,8 @@ static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
 
 /************************统一的数据库接口**********************/
 
-char BuildDNSDatabase()
+
+int BuildDNSDatabase()
 {
 	/*打开文本文件*/
 	dbTXT = fopen("dnsrelay.txt", "r");
@@ -241,11 +242,10 @@ char BuildDNSDatabase()
 	//return 1;
 
 
-	
+
 }
 
-char FindInDNSDatabase(const char* domainName,char*ip)
-{
+int FindInDNSDatabase(const char* domainName, char* ip) {
 	//if (db && SQLITE_OK == DNSSelect(db, domainName, ip)) { 
 	//	/*db不为空且找到了对应记录*/
 	//	return 1;
@@ -253,7 +253,14 @@ char FindInDNSDatabase(const char* domainName,char*ip)
 	//	return 0;
 	//}
 
+	/*先在cache里面找*/
+	if (FindInDNSCache(domainName, ip)) {
+		return 1;
+	}
+
 	if (dbTXT && FindIPByDNSinTXT(dbTXT, domainName, ip)) {
+		/*记录插入到cache中*/
+		InsertIntoDNSCache(dbTXT, ip, TTL);
 		return 1; /*db存在且找到了对应记录*/
 	} else {
 		return 0;
@@ -261,6 +268,62 @@ char FindInDNSDatabase(const char* domainName,char*ip)
 
 }
 
+/***********************cache接口*************************/
+
+/*不需要对外开放*/
+typedef struct {
+	char domainName[MAX_DOMAINNAME];/*域名*/
+	char ip[MAX_IP_BUFSIZE];		/*ip*/
+	int ttl;						/*ttl*/
+}DNScache;
+
+/*cache数组, 有位置就插, 就这么随便实现一下吧, 最低效的cache*/
+static DNScache cache[MAX_CACHE_SIZE] = { NULL };
+
+static time_t cacheLastCheckTime = 0; /*上一次检查的时间, 初始化为0, 非零的时候才检查*/
+
+/*
+	Discription:	在DNScache中查找域名
+	Params:
+		domainName	域名
+		ip			ip地址，返回值,请保证至少有16字节的空间(15个字符+\0)
+
+	Return:
+		0: 没找到
+		1: 找到了
+*/
 
 
+static int FindInDNSCache(const char* domainName, char* ip) {
+	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+		if (cache[i].ttl > 0 && !strcmp(cache[i].domainName, domainName)) {
+			sprintf(ip, "%s", cache[i].ip);
+			return 1;
+		}
+	}
+	return 0;
+}
 
+int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl) {
+	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+		if (cache[i].ttl <= 0) {
+			sprintf(cache[i].domainName, "%s", domainName);
+			sprintf(cache[i].ip, "%s", ip);
+			cache[i].ttl = ttl;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void UpdateCache() {
+	time_t newTime = time(0);
+	time_t diff = newTime - cacheLastCheckTime;
+	printf("离上一次检查过去了diff秒\n");
+	if (diff) { //时间变了
+		cacheLastCheckTime = newTime;
+		for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+			cache[i].ttl -= diff;
+		}
+	}
+}
