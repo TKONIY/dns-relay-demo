@@ -27,7 +27,7 @@ int PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
 		clientTable.base[clientTable.rear].addr = *pAddr;
 		clientTable.base[clientTable.rear].originId = *pId;
 		clientTable.base[clientTable.rear].r = 0;
-		clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
+		clientTable.base[clientTable.rear].expireTime = (int)time(NULL) + 3;//TODO
 		//clientTable.base[clientTable.rear].addrReq = *rAddr; /*获取发出请求的客户端地址*/
 		*pId = clientTable.rear;/*获取新的ID*/
 		clientTable.rear = (clientTable.rear + 1) % MAX_QUERIES;
@@ -96,9 +96,9 @@ int CheckExpired() {
 		time(NULL) > clientTable.base[clientTable.front].expireTime;
 }
 
-int SetTime() {
-	clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
-}
+//int SetTime() {
+//	clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
+//}
 /*******************SQLite封装*******************************/
 
 //static sqlite3* db = NULL;  /*数据库对象*/
@@ -200,6 +200,67 @@ static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
 	return 1;
 }
 
+
+/***********************cache接口*************************/
+
+/*不需要对外开放*/
+typedef struct {
+	char domainName[MAX_DOMAINNAME];/*域名*/
+	char ip[MAX_IP_BUFSIZE];		/*ip*/
+	int ttl;						/*ttl*/
+}DNScache;
+
+/*cache数组, 有位置就插, 就这么随便实现一下吧, 最低效的cache*/
+static DNScache cache[MAX_CACHE_SIZE] = { 0 };
+
+static time_t cacheLastCheckTime = 0; /*上一次检查的时间, 初始化为0, 非零的时候才检查*/
+
+/*
+	Discription:	在DNScache中查找域名
+	Params:
+		domainName	域名
+		ip			ip地址，返回值,请保证至少有16字节的空间(15个字符+\0)
+
+	Return:
+		0: 没找到
+		1: 找到了
+*/
+
+
+static int FindInDNSCache(const char* domainName, char* ip) {
+	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+		if (cache[i].ttl > 0 && !strcmp(cache[i].domainName, domainName)) {
+			sprintf(ip, "%s", cache[i].ip);
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl) {
+	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+		if (cache[i].ttl <= 0) {
+			sprintf(cache[i].domainName, "%s", domainName);
+			sprintf(cache[i].ip, "%s", ip);
+			cache[i].ttl = ttl;
+			return 1;
+		}
+	}
+	return 0;
+}
+
+void UpdateCache() {
+	time_t newTime = time(0);
+	time_t diff = newTime - cacheLastCheckTime;
+	printf("离上一次检查过去了diff秒\n");
+	if (diff) { //时间变了
+		cacheLastCheckTime = newTime;
+		for (int i = 0; i < MAX_CACHE_SIZE; i++) {
+			cache[i].ttl -= (int)diff;
+		}
+	}
+}
+
 /************************统一的数据库接口**********************/
 
 
@@ -260,70 +321,10 @@ int FindInDNSDatabase(const char* domainName, char* ip) {
 
 	if (dbTXT && FindIPByDNSinTXT(dbTXT, domainName, ip)) {
 		/*记录插入到cache中*/
-		InsertIntoDNSCache(dbTXT, ip, TTL);
+		InsertIntoDNSCache(domainName, ip, TTL);
 		return 1; /*db存在且找到了对应记录*/
 	} else {
 		return 0;
 	}
 
-}
-
-/***********************cache接口*************************/
-
-/*不需要对外开放*/
-typedef struct {
-	char domainName[MAX_DOMAINNAME];/*域名*/
-	char ip[MAX_IP_BUFSIZE];		/*ip*/
-	int ttl;						/*ttl*/
-}DNScache;
-
-/*cache数组, 有位置就插, 就这么随便实现一下吧, 最低效的cache*/
-static DNScache cache[MAX_CACHE_SIZE] = { NULL };
-
-static time_t cacheLastCheckTime = 0; /*上一次检查的时间, 初始化为0, 非零的时候才检查*/
-
-/*
-	Discription:	在DNScache中查找域名
-	Params:
-		domainName	域名
-		ip			ip地址，返回值,请保证至少有16字节的空间(15个字符+\0)
-
-	Return:
-		0: 没找到
-		1: 找到了
-*/
-
-
-static int FindInDNSCache(const char* domainName, char* ip) {
-	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
-		if (cache[i].ttl > 0 && !strcmp(cache[i].domainName, domainName)) {
-			sprintf(ip, "%s", cache[i].ip);
-			return 1;
-		}
-	}
-	return 0;
-}
-
-int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl) {
-	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
-		if (cache[i].ttl <= 0) {
-			sprintf(cache[i].domainName, "%s", domainName);
-			sprintf(cache[i].ip, "%s", ip);
-			cache[i].ttl = ttl;
-			return 1;
-		}
-	}
-	return 0;
-}
-
-void UpdateCache() {
-	time_t newTime = time(0);
-	time_t diff = newTime - cacheLastCheckTime;
-	printf("离上一次检查过去了diff秒\n");
-	if (diff) { //时间变了
-		cacheLastCheckTime = newTime;
-		for (int i = 0; i < MAX_CACHE_SIZE; i++) {
-			cache[i].ttl -= diff;
-		}
-	}
 }

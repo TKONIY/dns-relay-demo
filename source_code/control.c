@@ -15,12 +15,6 @@ char addrDNSclie[16] = "127.0.0.1";
 int gDebugLevel = 0;
 
 
-event_type WaitForEvent() {
-	UpdateCache(); /*¸üÐÂcache*/
-	return dgram_arrival;
-}
-
-
 void DebugBuffer(const unsigned char* buf, int bufSize) {
 	char isEnd = 0;
 	if (bufSize > MAX_BUFSIZE)

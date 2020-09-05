@@ -131,7 +131,7 @@ extern int CheckExpired();
 	Return:
 		int				默认3秒
 */
-extern int SetTime();
+//extern int SetTime();
 
 /******************DNSTable系列方法***********************/
 

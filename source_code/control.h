@@ -22,18 +22,11 @@ int gDebugLevel;					/*调试等级*/
 
 /*
 	核心组件.
-	WaitForEvent();
 	DNSDebug();  //打印到日志中
 	CmdResolve();//不同模式用不同码表示
 	.....
 */
 
-/*
-	Discription:
-	Params:
-	Return:
-*/
-extern event_type WaitForEvent();
 
 
 /********************** Buffer API **********************/

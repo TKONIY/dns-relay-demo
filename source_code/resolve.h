@@ -1,9 +1,9 @@
 #pragma once
 #include <string.h>
 #include <winsock2.h>
-#include<WS2tcpip.h>
-#include"database.h"
-#include"control.h"
+#include <WS2tcpip.h>
+#include "database.h"
+#include "control.h"
 
 /*可以使用database的所有接口,以及control中定义的宏*/
 
@@ -42,3 +42,11 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf,  i
 	return:			int	---- 最终写入到sendBuf的字节数
 */
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte,SOCKADDR_IN*addrCli);
+
+
+/*
+	Discription:
+	Params:
+	Return:
+*/
+extern event_type WaitForEvent();
