@@ -29,11 +29,18 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
 	domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
 	if (FindInDNSDatabase(domainName, ip)) {	/*如果找到记录*/
-
+		printf("在数据库中找到了记录 %s : %s\n", domainName, ip);
 		memcpy(sendBuf, recvBuf, recvByte);		/*将接收内容复制到发送缓冲*/
 		sendBuf[2] |= 0x80;						/*QR=response*/
 		sendBuf[2] |= 0x05;						/*Authority=1*/
 		sendBuf[3] |= 0x80;						/*RA=1*/
+
+		if (!strcmp(ip, "0.0.0.0")) {			/*域名无效*/
+			sendBuf[7] |= 0x00;					/*Answer count = 0*/
+			sendBuf[3] |= 0x03;					/*域名不存在*/
+			return recvByte;					/*报文长度为首部长度*/
+		}
+
 		sendBuf[7] |= 0x01;						/*Answer count = 1*/
 		unsigned char answer[16] = { 0 };		/*填充answer区域为0*/
 		answer[0] = 0xc0;						/*使用指针表示域名*/
@@ -47,7 +54,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		return recvByte + 16;					/*sendBuf的大小*/
 
 	} else {
-
+		printf("没有在数据库中找到记录: %s\n", domainName);
 		/*如果在数据库中找不到,则直接转发给本地DNS服务器---*/
 		DNSHeader* header = (DNSHeader*)recvBuf;
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));

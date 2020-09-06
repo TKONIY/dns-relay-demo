@@ -188,10 +188,12 @@ static int DNSImport(sqlite3* db, const char* fname) {
 
 /*******************dnsrelay.txt文本数据库封装****************/
 static FILE* dbTXT = NULL;		/*文本数据库对象*/
+static fpos_t dbHome = 0;		/*避免每次重新打开文件, */
 
 /*封装从文本中查询IP接口*/
 static int FindIPByDNSinTXT(FILE* dbTXT, const char* name, char* ip) {
 	char retName[MAX_DOMAINNAME] = { '\0' };
+	fsetpos(dbTXT, &dbHome);	/*设置到起始位置*/
 	while (!feof(dbTXT)) {
 		fscanf(dbTXT, "%s %s", ip, retName);
 		if (!strcmp(retName, name))break;
@@ -268,6 +270,7 @@ int BuildDNSDatabase()
 {
 	/*打开文本文件*/
 	dbTXT = fopen("dnsrelay.txt", "r");
+	fgetpos(dbTXT, &dbHome);
 	if (!dbTXT)return 0;
 	return 1;
 
@@ -301,9 +304,6 @@ int BuildDNSDatabase()
 	//	return 0;
 	//}
 	//return 1;
-
-
-
 }
 
 int FindInDNSDatabase(const char* domainName, char* ip) {
