@@ -10,7 +10,7 @@
 #define MAX_IP_BUFSIZE 16			/*IP的最大长度*/
 #define MAX_DOMAINNAME 100			/*域名的最大长度*/
 #define TTL 120						/*TTL的初始值*/
-typedef enum { dgram_arrival, timeout } event_type; /*事件类型*/
+typedef enum { dgram_arrival, timeout, nothing } event_type; /*事件类型*/
 /*extern const char* gDefaultDBtxt;*/	/*默认txt格式的数据库文件*/
 /*extern const char* gDefaultDBsqlite;*//*默认sqlite3数据库文件*/
 extern char gDBtxt[100];			/*用户指定的txt数据库文件名*/
