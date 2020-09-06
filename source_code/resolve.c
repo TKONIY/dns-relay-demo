@@ -70,15 +70,24 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 }
 
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
+	char temttl[16] = { '\0' };
+	char ip[16] = { '\0' };						/*存放ip*/
+	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
+	int ttl;
 	unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
 	/*FindCRecord要用到的两个参数*/
 	DNSHeader* header = (DNSHeader*)recvBuf;
-	CRecord* pRecord = (CRecord*)recvBuf;	/*TODO!!! 什么鬼, 快改掉,*/
+	memcpy(tempBuf, recvBuf, recvByte);
+	domainName_ntop(tempBuf + 12, domainName);	/*获取域名*/
+	memcpy(ip, tempBuf + (recvByte - 4), 4);
+	memcpy(temttl, tempBuf + (recvByte - 10), 4);
+	DebugBuffer(temttl, 4);
+	//DebugBuffer(ip,4);
+	CRecord* pRecord = (CRecord*)tempBuf;	/*TODO!!! 什么鬼, 快改掉,*/
 	printf("收到ID为%x的响应报文\n", ntohs(header->ID));
 	/*外部DNS给出的ID是newID，FindCRecord前记录Buf*/
 	DNSID newID = ntohs(header->ID);		
-	memcpy(tempBuf, recvBuf, recvByte);
-
+	
 	/*TODO*/
 	/*
 		把查询到的结果更新到cache, 需要从DNS报文中获取TTL, 域名, IP;
