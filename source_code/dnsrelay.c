@@ -40,7 +40,7 @@ int main(int argc, char* argv[]) {
 	unsigned char sendBuf[MAX_BUFSIZE] = { '\0' };	/*发送缓冲*/
 	int recvByte = 0;								/*recvBuf存放的报文大小*/
 	int sendByte = 0;								/*sendBuf存放的报文大小*/
-	//int front;                                       /*每次判断超时时存储队头*/
+	//int front;                                    /*每次判断超时时存储队头*/
 
 	/* 获取socket版本2.2 */
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {

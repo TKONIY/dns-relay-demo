@@ -228,7 +228,6 @@ static time_t cacheLastCheckTime = 0; /*…œ“ª¥ŒºÏ≤Èµƒ ±º‰, ≥ı ºªØŒ™0, ∑«¡„µƒ ±∫Ú≤
 		1: ’“µΩ¡À
 */
 
-
 static int FindInDNSCache(const char* domainName, char* ip) {
 	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
 		if (cache[i].ttl > 0 && !strcmp(cache[i].domainName, domainName)) {
@@ -254,11 +253,11 @@ int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl) {
 void UpdateCache() {
 	time_t newTime = time(0);
 	time_t diff = newTime - cacheLastCheckTime;
-	printf("¿Î…œ“ª¥ŒºÏ≤Èπ˝»•¡Àdiff√Î\n");
+	printf("¿Î…œ“ª¥ŒºÏ≤Èπ˝»•¡À%lld√Î\n", diff);
 	if (diff) { // ±º‰±‰¡À
 		cacheLastCheckTime = newTime;
 		for (int i = 0; i < MAX_CACHE_SIZE; i++) {
-			cache[i].ttl -= (int)diff;
+			if (cache[i].ttl > 0)cache[i].ttl -= (int)diff;
 		}
 	}
 }
