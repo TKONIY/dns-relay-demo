@@ -115,8 +115,3 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	}
 }
 
-event_type WaitForEvent() {
-	UpdateCache(); /*¸üÐÂcache*/
-	return dgram_arrival;
-}
-

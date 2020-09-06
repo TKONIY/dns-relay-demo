@@ -7,6 +7,11 @@
 #include "resolve.h"
 #pragma comment(lib,"ws2_32.lib")
 
+event_type WaitForEvent() {
+	UpdateCache(); /*更新cache*/
+	return dgram_arrival;
+}
+
 int main(int argc, char* argv[]) {
 
 	if (dealOpts(argc, argv)) { /*成功获取参数*/
@@ -150,10 +155,6 @@ int main(int argc, char* argv[]) {
 			break;
 		}
 	}
-
-
-
-
 
 	/* 运行结束, socket关闭 */
 	if (closesocket(sockSrv) != 0)
