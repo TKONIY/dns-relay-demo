@@ -44,9 +44,9 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf,  i
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte,SOCKADDR_IN*addrCli);
 
 
-/*
-	Discription:
-	Params:
-	Return:
-*/
-extern event_type WaitForEvent();
+///*
+//	Discription:
+//	Params:
+//	Return:
+//*/
+//extern event_type WaitForEvent();
