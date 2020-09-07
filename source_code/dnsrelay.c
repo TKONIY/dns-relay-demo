@@ -2,14 +2,34 @@
 #include<winsock2.h>
 #include<WS2tcpip.h>
 #include<conio.h>
+#include<time.h>
 #include "control.h"
 #include "database.h"
 #include "resolve.h"
 #pragma comment(lib,"ws2_32.lib")
 
-event_type WaitForEvent() {
+event_type WaitForEvent(SOCKET fd) {
 	UpdateCache(); /*更新cache*/
-	return dgram_arrival;
+
+
+
+	/*
+		TODO by 潘浩楠!!
+		更新队列, 超时重传
+	*/
+
+
+	fd_set readfds;
+	FD_ZERO(&readfds);
+	FD_SET(fd, &readfds);
+	struct timeval t = { 1,0 }; /*设置一秒钟的阻塞时间*/
+	select(0, &readfds, 0, 0, &t);
+
+	if (FD_ISSET(fd, &readfds)) {	/*可读*/
+		return dgram_arrival;
+	}
+
+	return nothing;
 }
 
 int main(int argc, char* argv[]) {
@@ -40,7 +60,7 @@ int main(int argc, char* argv[]) {
 	unsigned char sendBuf[MAX_BUFSIZE] = { '\0' };	/*发送缓冲*/
 	int recvByte = 0;								/*recvBuf存放的报文大小*/
 	int sendByte = 0;								/*sendBuf存放的报文大小*/
-	//int front;                                       /*每次判断超时时存储队头*/
+	//int front;                                    /*每次判断超时时存储队头*/
 
 	/* 获取socket版本2.2 */
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
@@ -86,8 +106,7 @@ int main(int argc, char* argv[]) {
 	/* 开始无尽的循环, 按下 Esc 退出循环 */
 	while (!(_kbhit() && _getch() == 27)) {
 
-
-		event = WaitForEvent();
+		event = WaitForEvent(sockSrv);
 		switch (event)
 		{
 		case timeout:
