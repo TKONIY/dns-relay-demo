@@ -77,40 +77,44 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 }
 
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
-	char temttl[16] = { '\0' };
-	char ip[16] = { '\0' };						/*存放ip*/
-	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
-	int ttl;
-	unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
+	//char temttl[16] = { '\0' };
+	//char ip[16] = { '\0' };						/*存放ip*/
+	//char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
+	//int ttl;
+	//unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
 	/*FindCRecord要用到的两个参数*/
-	DNSHeader* header = (DNSHeader*)recvBuf;
-	memcpy(tempBuf, recvBuf, recvByte);
-	domainName_ntop(tempBuf + 12, domainName);	/*获取域名*/
-	memcpy(ip, tempBuf + (recvByte - 4), 4);
-	memcpy(temttl, tempBuf + (recvByte - 10), 4);
-	DebugBuffer(temttl, 4);
+	//memcpy(tempBuf, recvBuf, recvByte);
+	//domainName_ntop(tempBuf + 12, domainName);	/*获取域名*/
+	//memcpy(ip, tempBuf + (recvByte - 4), 4);
+	//memcpy(temttl, tempBuf + (recvByte - 10), 4);
+	//DebugBuffer(temttl, 4);
 	//DebugBuffer(ip,4);
-	CRecord* pRecord = (CRecord*)tempBuf;	/*TODO!!! 什么鬼, 快改掉,*/
-	printf("收到ID为%x的响应报文\n", ntohs(header->ID));
+	//CRecord* pRecord = (CRecord*)tempBuf;	/*TODO!!! 什么鬼, 快改掉,*/
+	const DNSHeader* recvHeader = (DNSHeader*)recvBuf;			
+	printf("收到ID为%x的响应报文\n", ntohs(recvHeader->ID));
 	/*外部DNS给出的ID是newID，FindCRecord前记录Buf*/
-	DNSID newID = ntohs(header->ID);		
+	DNSID newID = ntohs(recvHeader->ID);		
 	
 	/*TODO*/
 	/*
 		把查询到的结果更新到cache, 需要从DNS报文中获取TTL, 域名, IP;
 	*/
 
-	if(FindCRecord((DNSID) newID, (CRecord*) pRecord)==1) {/*如果在clientTable中找到newID记录*/	
+	CRecord record = { 0 };
+	CRecord* pRecord = &record;
+
+
+	if (FindCRecord((DNSID)newID, (CRecord*)pRecord) == 1) {/*如果在clientTable中找到newID记录*/
 		if (pRecord->r == 0) {
 			SetCRecordR(newID); /*未回复则回复并把r置为1*/
 			/*printf("ID为 %hu 的报文已经回复\n", newID);*/
 		}else {
 			return -1; /*回复过就不做操作*/
 		}
-		memcpy(sendBuf, tempBuf, recvByte);       /*接受内容复制到发送缓存*/
+		memcpy(sendBuf, recvBuf, recvByte);			/*接受内容复制到发送缓存*/
 		/*将newID换成originID*/
-		header = (DNSHeader*)sendBuf;			  
-		header->ID = htons(pRecord->originId);
+		DNSHeader* sendHeader = (DNSHeader*)sendBuf;	/*header改为*/
+		sendHeader->ID = htons(pRecord->originId);
 		/*printf("orignID is %x\n", htons(pRecord->originId)); */
 		/*发送地址族IPv4,地址及端口:从CRecord中获取当前ID对应的源地址及端口*/
 		addrCli->sin_family = AF_INET;
