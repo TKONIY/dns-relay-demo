@@ -16,7 +16,7 @@ typedef enum { dgram_arrival, timeout, nothing } event_type; /*事件类型*/
 /*extern const char* gDefaultDBsqlite;*//*默认sqlite3数据库文件*/
 extern char gDBtxt[100];			/*用户指定的txt数据库文件名*/
 extern char addrDNSserv[16];		/*DNS服务器地址*/
-extern char addrDNSclie[16];		/*127.0.0.1*/
+extern char addrDNSlocalhost[16];		/*127.0.0.1*/
 extern char gDBsqlite[100];			/*sqlite数据库名字*/
 int gDebugLevel;					/*调试等级*/
 

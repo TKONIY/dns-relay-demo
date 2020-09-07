@@ -4,7 +4,7 @@
 #include <string.h>
 #include "control.h"
 
-#define MAX_QUERIES 5			/*最大支持的同时等待的用户query数*/
+#define MAX_QUERIES 25			/*最大支持的同时等待的用户query数*/
 #define MAX_CACHE_SIZE 100		/*dns缓存的容量*/
 
 typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/

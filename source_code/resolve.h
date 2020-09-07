@@ -41,7 +41,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf,  i
 		addrCli:	&新的目标地址
 	return:			int	---- 最终写入到sendBuf的字节数
 */
-extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte,SOCKADDR_IN*addrCli);
+extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli);
 
 
 ///*

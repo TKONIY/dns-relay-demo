@@ -136,9 +136,11 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 		sendHeader->ID = htons(pRecord->originId);
 		/*printf("orignID is %x\n", htons(pRecord->originId)); */
 		/*发送地址族IPv4,地址及端口:从CRecord中获取当前ID对应的源地址及端口*/
-		addrCli->sin_family = AF_INET;
+		/*addrCli->sin_family = AF_INET;
 		addrCli->sin_port = pRecord->addr.sin_port;
-		inet_pton(AF_INET, addrDNSclie, &addrCli->sin_addr);
+		addrCli->sin_addr = pRecord->addr.sin_addr;*/
+		*addrCli = pRecord->addr;
+		//inet_pton(AF_INET, pRecord->addr., &addrCli->sin_addr);
 		/*printf("address: %x\n", addrCli->sin_addr);*/
 		return recvByte;
 	}

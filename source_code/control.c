@@ -11,7 +11,7 @@ static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; /*¿Õbuffer*/
 char gDBtxt[100] = "dnsrelay.txt";		
 char gDBsqlite[100] = "dnsrelay.db";	
 char addrDNSserv[16] = "202.106.0.20";	
-char addrDNSclie[16] = "127.0.0.1";		
+char addrDNSlocalhost[16] = "127.0.0.1";		
 int gDebugLevel = 0;						
 
 
