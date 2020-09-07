@@ -47,14 +47,6 @@ event_type WaitForEvent(SOCKET fd) {
 			break;
 	}
 
-	/*
-		TODO by 潘浩楠!!
-		更新队列, 超时重传
-	*/
-
-
-
-
 	fd_set readfds;
 	FD_ZERO(&readfds);
 	FD_SET(fd, &readfds);

@@ -288,12 +288,11 @@ void UpdateCache() {
 int BuildDNSDatabase()
 {
 	/*打开文本文件*/
-	dbTXT = fopen("dnsrelay.txt", "r");
+	dbTXT = fopen(gDBtxt, "r");
 	fgetpos(dbTXT, &dbHome);
 	if (!dbTXT)return 0;
 	return 1;
 
-	///*创建数据库*/
 	//if (SQLITE_OK == sqlite3_open(gDBsqlite, &db)) {
 	//	printf("Database %s opened.\n", gDBsqlite);
 	//} else {
