@@ -4,17 +4,18 @@
 #include <string.h>
 #include "control.h"
 
-#define MAX_QUERIES 500				/*最大支持的同时等待的用户query数*/
+#define MAX_QUERIES 5			/*最大支持的同时等待的用户query数*/
 #define MAX_CACHE_SIZE 100		/*dns缓存的容量*/
 
 typedef unsigned short DNSID; /*适用于DNS报文的ID类型*/
+
 /*
 	Discription:			存放用户query记录的结构
 	Attributes:
 		SOCKADDR_IN addr	socket地址
 		DNSID originId		用户发送的DNS报文的ID
 		unsigned char r;	表示这个是否被reply了
-		expireTime	?
+		expireTime			超时时刻
 */
 
 typedef struct {
@@ -22,6 +23,7 @@ typedef struct {
 	DNSID originId;
 	unsigned char r;
 	int expireTime;
+
 }CRecord;
 
 /*
@@ -54,12 +56,19 @@ extern void InitCTable();
 extern void DebugCTable();
 
 /*
+	Discription:	返回ClientTable已经使用的空间
+	Return:			队列长度
+*/
+int CTableUsage();
+
+/*
 	Discription:		向ClientTable的队尾添加记录
 	Params:			
 		SOCKADDR* pAddr	地址(传入)
 		DNSID id		原id
 	Return:				
 		char			0/1表示是否成功
+	Remarks:			自动计算超时时刻
 */
 extern int PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
 
@@ -108,22 +117,22 @@ extern int GetCTableRearIndex();
 		int				序号	
 */
 extern int GetCTableFrontIndex();
+//
+///*
+//	Discription:		队首元素是否回复
+//	Params:
+//	Return:
+//		int				0/1表示是否回复过
+//*/
+//extern int GetCTableFrontIndex_r();
 
-/*
-	Discription:		队首元素是否回复
-	Params:
-	Return:
-		int				0/1表示是否回复过
-*/
-extern int GetCTableFrontIndex_r();
-
-/*
-	Discription:		队首元素是否超时
-	Params:
-	Return:
-		int				0/1表示是否超时
-*/
-extern int CheckExpired();
+///*
+//	Discription:		队首元素是否超时
+//	Params:
+//	Return:
+//		int				0/1表示是否超时
+//*/
+//extern int CheckExpired();
 
 /*
 	Discription:		给当前队首元素设置新超时时间
@@ -131,7 +140,7 @@ extern int CheckExpired();
 	Return:
 		int				默认3秒
 */
-//extern int SetTime();
+/*extern int SetTime();*/
 
 /******************DNSTable系列方法***********************/
 

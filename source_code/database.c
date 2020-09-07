@@ -17,6 +17,16 @@ void DebugCTable() {
 	int used = clientTable.rear - clientTable.front;
 	used = used < 0 ? used + MAX_QUERIES : used;
 	printf("队列最大缓存%d 已使用%d\n", MAX_QUERIES, used);
+
+	/*for (int i = 0; i < MAX_QUERIES; ++i) {
+		printf("expiretime: %d\n now: %d\n", clientTable.base[i].expireTime, time(NULL));
+	}*/
+}
+
+int CTableUsage() {
+	int used = clientTable.rear - clientTable.front;
+	used = used < 0 ? used + MAX_QUERIES : used;
+	return used; 
 }
 
 int PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
@@ -27,7 +37,8 @@ int PushCRecord(const SOCKADDR_IN* pAddr, DNSID* pId) {
 		clientTable.base[clientTable.rear].addr = *pAddr;
 		clientTable.base[clientTable.rear].originId = *pId;
 		clientTable.base[clientTable.rear].r = 0;
-		clientTable.base[clientTable.rear].expireTime = (int)time(NULL) + 3;//TODO
+		/*塞进去的时候计算超时时间*/
+		clientTable.base[clientTable.rear].expireTime = (int)time(NULL) + TIMEOUT;
 		//clientTable.base[clientTable.rear].addrReq = *rAddr; /*获取发出请求的客户端地址*/
 		*pId = clientTable.rear;/*获取新的ID*/
 		clientTable.rear = (clientTable.rear + 1) % MAX_QUERIES;
@@ -40,7 +51,7 @@ int PopCRecord() {
 		printf("队列为空，PopCRecord()失败。\n");
 		return 0;
 	} else {
-		++clientTable.front;
+		clientTable.front = (clientTable.front + 1) % MAX_QUERIES;
 		return 1;
 	}
 }
@@ -56,7 +67,7 @@ int SetCRecordR(DNSID id) {
 		clientTable.base[id].r = 1;
 		return 1;
 	} else {
-		printf("要修改的记录不存在,索引越界,SetCRecordR()失败\n");
+		printf("要修改的记录不存在,索引越界,SetCRecordR()失败 ID=%d\n", id);
 		return 0;
 	}
 }
@@ -70,6 +81,7 @@ int FindCRecord(DNSID id, CRecord* pRecord) {
 			&& (id < clientTable.rear || id >= clientTable.front))
 		) {
 		*pRecord = clientTable.base[id];
+		printf("FindCRecord:ID=%d, %d, %d\n", id, clientTable.base[id].expireTime, clientTable.base[id].originId);
 		return 1;
 	} else {
 		printf("要查找的记录不存在,索引越界,SetCRecordR()失败\n");
@@ -82,19 +94,21 @@ int GetCTableRearIndex() {
 	return ((clientTable.rear + MAX_QUERIES - 1) % MAX_QUERIES);
 }
 
+
 int GetCTableFrontIndex() {
 	return clientTable.front;
 }
 
-int GetCTableFrontIndex_r() {
-	return clientTable.base[clientTable.front].r;
-}
 
-int CheckExpired() {
+//int GetCTableFrontIndex_r() {
+//	return clientTable.base[clientTable.front].r;
+//}
+
+//int CheckExpired() {
 	/*判断是否超时*/
-	return clientTable.base[clientTable.front].expireTime > 0 &&
-		time(NULL) > clientTable.base[clientTable.front].expireTime;
-}
+//	return clientTable.base[clientTable.front].expireTime > 0 &&
+	//	time(NULL) > clientTable.base[clientTable.front].expireTime;
+//}
 
 //int SetTime() {
 //	clientTable.base[clientTable.rear].expireTime = time(NULL) + 3;
@@ -232,6 +246,7 @@ static int FindInDNSCache(const char* domainName, char* ip) {
 	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
 		if (cache[i].ttl > 0 && !strcmp(cache[i].domainName, domainName)) {
 			sprintf(ip, "%s", cache[i].ip);
+			printf("cache: %s,%s\n", cache[i].domainName, domainName);
 			return 1;
 		}
 	}
@@ -241,6 +256,7 @@ static int FindInDNSCache(const char* domainName, char* ip) {
 int InsertIntoDNSCache(const char* domainName, const char* ip, int ttl) {
 	for (int i = 0; i < MAX_CACHE_SIZE; i++) {
 		if (cache[i].ttl <= 0) {
+			printf("cachesave: %s, %s, %d\n", domainName, ip, ttl);
 			sprintf(cache[i].domainName, "%s", domainName);
 			sprintf(cache[i].ip, "%s", ip);
 			cache[i].ttl = ttl;
@@ -260,7 +276,7 @@ void UpdateCache() {
 			if (cache[i].ttl > 0)
 			{
 				cache[i].ttl -= (int)diff;
-				printf("%s : %s  TTL= %d\n", cache[i].domainName, cache[i].ip, cache[i].ttl);
+				//printf("%s : %s  TTL= %d\n", cache[i].domainName, cache[i].ip, cache[i].ttl);
 			}
 		}
 	}
@@ -319,6 +335,7 @@ int FindInDNSDatabase(const char* domainName, char* ip) {
 
 	/*先在cache里面找*/
 	if (FindInDNSCache(domainName, ip)) {
+		printf("在cache中找到\n");
 		return 1;
 	}
 

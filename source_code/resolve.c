@@ -62,6 +62,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
 		if (PushCRecord(addrCli, &newID)) {/*如果成功加入队列*/
+			//SetTime();
 			/*填写发送缓冲*/
 			memcpy(sendBuf, recvBuf, recvByte);
 			/*更新转发ID*/
@@ -88,7 +89,9 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	inet_ntop(AF_INET, recvBuf + (12 + domainlen + 16), ip, 16);
 	int ttl = ntohl(*((int*)(recvBuf + (12 + domainlen + 10))));
 	//int* pttl = recvBuf + (12 + domainlen + 10);
-	InsertIntoDNSCache(domainName, ip, ttl);
+	if (!recvBuf[3]) { /*Z字段永远为0, RCODE为0表示正常*/
+		InsertIntoDNSCache(domainName, ip, ttl);
+	}
 
 	//printf("*pttl: %d\n", *pttl);
 	//printf("char2ttl: %d\n", recvBuf[12 + domainlen + 13]);

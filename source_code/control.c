@@ -8,11 +8,11 @@ static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; /*¿Õbuffer*/
 
 /*extern const char* gDefaultDBtxt = "dnsrelay.txt";*/	
 /*extern const char* gDefaultDBsqlite = "dnsrelay.db";*/
-char gDBtxt[100] = "dnsrelay.txt";
-char gDBsqlite[100] = "dnsrelay.db";
-char addrDNSserv[16] = "202.106.0.20"; 
-char addrDNSclie[16] = "127.0.0.1";
-int gDebugLevel = 0;
+char gDBtxt[100] = "dnsrelay.txt";		
+char gDBsqlite[100] = "dnsrelay.db";	
+char addrDNSserv[16] = "202.106.0.20";	
+char addrDNSclie[16] = "127.0.0.1";		
+int gDebugLevel = 0;						
 
 
 void DebugBuffer(const unsigned char* buf, int bufSize) {

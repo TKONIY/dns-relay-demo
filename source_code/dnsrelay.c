@@ -9,14 +9,50 @@
 #pragma comment(lib,"ws2_32.lib")
 
 event_type WaitForEvent(SOCKET fd) {
+	/*
+		TODO, 解释早期采用返回事件类型机制的原因。
+	*/
+
 	UpdateCache(); /*更新cache*/
 
+	while (1)
+	{
+		//DebugCTable(); /*查看Client队列空间*/
 
+
+		CRecord record = { 0 };
+		if (CTableUsage()
+			&& FindCRecord(GetCTableFrontIndex(), &record)
+			&& record.r) {
+			PopCRecord();
+			continue;
+		}
+		//FindCRecord(GetCTableFrontIndex(), &record);
+		//printf("%d, %d\n", record.expireTime, record.originId);
+		if (CTableUsage()
+			&& FindCRecord(GetCTableFrontIndex(), &record)
+			&& record.expireTime
+			&& time(NULL) > record.expireTime) {
+			/*
+				超时处理, 直接从缓存中删除, 理由如下:
+				1. 服务器select()模型等待的时间为1s, 而nslookup自身的重传间隔是2s。
+				   中继器检查到之后再重传没有意义。
+			*/
+			printf("删除\n");
+			PopCRecord();
+			continue;
+		}
+
+		else
+			break;
+	}
 
 	/*
 		TODO by 潘浩楠!!
 		更新队列, 超时重传
 	*/
+
+
 
 
 	fd_set readfds;
