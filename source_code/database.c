@@ -257,7 +257,11 @@ void UpdateCache() {
 	if (diff) { //时间变了
 		cacheLastCheckTime = newTime;
 		for (int i = 0; i < MAX_CACHE_SIZE; i++) {
-			if (cache[i].ttl > 0)cache[i].ttl -= (int)diff;
+			if (cache[i].ttl > 0)
+			{
+				cache[i].ttl -= (int)diff;
+				printf("%s : %s  TTL= %d\n", cache[i].domainName, cache[i].ip, cache[i].ttl);
+			}
 		}
 	}
 }

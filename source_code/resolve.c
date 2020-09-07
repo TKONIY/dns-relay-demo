@@ -14,6 +14,8 @@ static int domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 	/*第一个字符不要*/
 	
 	memcpy(pName, nName+1, strlen((char*)nName));/*网络域名也以\0结束,可以使用strlen*/
+	int length;
+	length = strlen((char*)nName) + 1;
 	int i = nName[0];/*第一个点的位置*/
 	while (pName[i]) {						/*遍历到0时结束*/
 		int offset = pName[i];				/*下一段的长度*/
@@ -21,7 +23,7 @@ static int domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 		/*printf("i=%d\n", i);*/			/*调试用*/
 		i += offset+1;						/*跳到下一个分隔处*/
 	}
-	return 1;
+	return length;
 }
 
 extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
@@ -78,13 +80,27 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	//char temttl[16] = { '\0' };
-	//char ip[16] = { '\0' };						/*存放ip*/
-	//char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
+	char ip[16] = { '\0' };								/*存放ip*/
+	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
+	int domainlen;                                            
+	
+	domainlen = domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
+	inet_ntop(AF_INET, recvBuf + (12 + domainlen + 16), ip, 16);
+	int ttl = ntohl(*((int*)(recvBuf + (12 + domainlen + 10))));
+	//int* pttl = recvBuf + (12 + domainlen + 10);
+	InsertIntoDNSCache(domainName, ip, ttl);
+
+	//printf("*pttl: %d\n", *pttl);
+	//printf("char2ttl: %d\n", recvBuf[12 + domainlen + 13]);
+	
+	//DebugBuffer(recvBuf + (12 + domainlen + 10), 8);
+	printf("ttl在此:%d\n",ttl);
+	//memcpy(ip, tempBuf + (recvByte - 4), 4);
 	//int ttl;
 	//unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
 	/*FindCRecord要用到的两个参数*/
 	//memcpy(tempBuf, recvBuf, recvByte);
-	//domainName_ntop(tempBuf + 12, domainName);	/*获取域名*/
+	
 	//memcpy(ip, tempBuf + (recvByte - 4), 4);
 	//memcpy(temttl, tempBuf + (recvByte - 10), 4);
 	//DebugBuffer(temttl, 4);
