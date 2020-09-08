@@ -6,42 +6,43 @@
 
 static const char emptyBuffer[MAX_BUFSIZE] = { '\0' }; /*空buffer*/
 
-/*extern const char* gDefaultDBtxt = "dnsrelay.txt";*/	
+/*extern const char* gDefaultDBtxt = "dnsrelay.txt";*/
 /*extern const char* gDefaultDBsqlite = "dnsrelay.db";*/
-char gDBtxt[100] = "dnsrelay.txt";		
-char gDBsqlite[100] = "dnsrelay.db";	
-char addrDNSserv[16] = "202.106.0.20";	
-char addrDNSlocalhost[16] = "127.0.0.1";		
-int gDebugLevel = 0;						
+char gDBtxt[100] = "dnsrelay.txt";
+char gDBsqlite[100] = "dnsrelay.db";
+char addrDNSserv[16] = "202.106.0.20";
+char addrDNSlocalhost[16] = "127.0.0.1";
+int gDebugLevel = 0;
 
 
 void DebugBuffer(const unsigned char* buf, int bufSize) {
+	if (gDebugLevel < 2)return; /*调试级别2以上才输出buffer*/
 	char isEnd = 0;
 	if (bufSize > MAX_BUFSIZE)
-		printf("DebugBuffer() failed, bufSize too big: %d>%d", bufSize, MAX_BUFSIZE);
+		debugPrintf("DebugBuffer() failed, bufSize too big: %d>%d", bufSize, MAX_BUFSIZE);
 	else {
 		/*bufSize = ((bufSize - 1) / 16 + 1) * 16;*/ /*debug时打印完整行内存*/
 		for (int i = 0; i < bufSize; ++i) {
-			printf("%02x ", buf[i]);
+			debugPrintf("%02x ", buf[i]);
 			isEnd = 0;
 			if (i % 16 == 15) {
-				printf("\n");
+				debugPrintf("\n");
 				isEnd = 1;
 			}
 		}
 		if (!isEnd)
-			printf("\n");
+			debugPrintf("\n");
 	}
 }
 
 void ClearBuffer(unsigned char* buf, int bufSize) {
 	if (bufSize > MAX_BUFSIZE)
-		printf("ClearBuffer() failed, bufSize too big: %d>%d\n", bufSize, MAX_BUFSIZE);
+		debugPrintf("ClearBuffer() failed, bufSize too big: %d>%d\n", bufSize, MAX_BUFSIZE);
 	else if (bufSize < 0)
-		printf("ClearBuffer() failed, bufSize error: %d\n", bufSize);
+		debugPrintf("ClearBuffer() failed, bufSize error: %d\n", bufSize);
 	else
 		memset(buf, 0, bufSize);
-		/*memcpy(buf,emptyBuffer, bufSize);*/
+	/*memcpy(buf,emptyBuffer, bufSize);*/
 }
 
 extern int dealOpts(int argc, char* argv[]) {
@@ -100,3 +101,12 @@ extern int dealOpts(int argc, char* argv[]) {
 	else return 0;			/*没处理完,返回失败*/
 
 }
+
+void debugPrintf(const char* cmd, ...) {
+	if (gDebugLevel < 1) return; /*调试级别>=1才执行*/
+	va_list args;
+	va_start(args, cmd);
+	vprintf(cmd, args);
+	va_end(args);
+}
+

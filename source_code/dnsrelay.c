@@ -28,7 +28,7 @@ event_type WaitForEvent(SOCKET fd) {
 			continue;
 		}
 		//FindCRecord(GetCTableFrontIndex(), &record);
-		//printf("%d, %d\n", record.expireTime, record.originId);
+		// debugPrintf("%d, %d\n", record.expireTime, record.originId);
 		if (CTableUsage()
 			&& FindCRecord(GetCTableFrontIndex(), &record)
 			&& record.expireTime
@@ -38,7 +38,7 @@ event_type WaitForEvent(SOCKET fd) {
 				1. 服务器select()模型等待的时间为1s, 而nslookup自身的重传间隔是2s。
 				   中继器检查到之后再重传没有意义。
 			*/
-			printf("删除\n");
+			debugPrintf("删除\n");
 			PopCRecord();
 			continue;
 		}
@@ -63,17 +63,17 @@ event_type WaitForEvent(SOCKET fd) {
 int main(int argc, char* argv[]) {
 
 	if (dealOpts(argc, argv)) { /*成功获取参数*/
-		printf("Debug level %d\n", gDebugLevel);
-		printf("Name server %s:53\n", addrDNSserv);
-		printf("Database using %s\n", gDBtxt);
+		debugPrintf("Debug level %d\n", gDebugLevel);
+		debugPrintf("Name server %s:53\n", addrDNSserv);
+		debugPrintf("Database using %s\n", gDBtxt);
 	} else {					/*获取参数失败*/
-		printf("Please use the following format:\n"
+		debugPrintf("Please use the following format:\n"
 			"dnsrelay [-d|-dd] [dns-server-ipaddr] [filename]");
 		return 0;
 	}
 
 	if (!BuildDNSDatabase()) {
-		printf("Failed to build the database.\n");
+		debugPrintf("Failed to build the database.\n");
 		return 0;
 	}
 
@@ -92,7 +92,7 @@ int main(int argc, char* argv[]) {
 
 	/* 获取socket版本2.2 */
 	if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-		printf("Server: WSAStartup failed with error %ld\n", WSAGetLastError());
+		debugPrintf("Server: WSAStartup failed with error %ld\n", WSAGetLastError());
 		return 0;
 	}
 
@@ -104,10 +104,10 @@ int main(int argc, char* argv[]) {
 	*/
 	SOCKET sockSrv = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (sockSrv == INVALID_SOCKET) {
-		printf("Invalid socket error %ld\n", WSAGetLastError());
+		debugPrintf("Invalid socket error %ld\n", WSAGetLastError());
 		WSACleanup();/* clean up */
 		return 0;
-	} else printf("Socket() is OK!\n");
+	} else debugPrintf("Socket() is OK!\n");
 
 	/* 构造地址 */
 	addrSrv.sin_family = AF_INET;
@@ -117,11 +117,11 @@ int main(int argc, char* argv[]) {
 	/* 绑定socket */
 	if (bind(sockSrv, (SOCKADDR*)&addrSrv, sizeof(addrSrv)) == SOCKET_ERROR) {
 		/* 绑定错误 */
-		printf("Failed to bind() with error %ld\n", WSAGetLastError());
+		debugPrintf("Failed to bind() with error %ld\n", WSAGetLastError());
 		closesocket(sockSrv);	/* 关闭socket */
 		WSACleanup();			/* clean up */
 		return 0;
-	} else printf("Bind() is OK!\n");
+	} else debugPrintf("Bind() is OK!\n");
 
 	/* 打印 socket 信息 */
 	/*getsockname(sockSrv, (SOCKADDR*)&addrSrv, (int*)sizeof(addrSrv));*/
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
 		switch (event)
 		{
 		case timeout:
-			printf("Timeout.\n");
+			debugPrintf("Timeout.\n");
 			break;
 
 		case dgram_arrival:
@@ -148,49 +148,49 @@ int main(int argc, char* argv[]) {
 			ClearBuffer(sendBuf, sendByte);
 
 			/*接收报文*/
-			printf("datagram arrived. Recieving...\n");
+			debugPrintf("datagram arrived. Recieving...\n");
 			recvByte = recvfrom(sockSrv, (char*)recvBuf, MAX_BUFSIZE, 0, (SOCKADDR*)&addrCli, &addrCliSize);
 			if (recvByte <= 0) {
-				printf("recvfrom() failed with error %ld\n", WSAGetLastError());
+				debugPrintf("recvfrom() failed with error %ld\n", WSAGetLastError());
 				recvByte = 0; /*置零*/
 				break;
 			} else
-				printf("datagram received. %d Bytes in all.\n", recvByte);
+				debugPrintf("datagram received. %d Bytes in all.\n", recvByte);
 
 			/*判断接收的是response还是query,更新报文sendBuf,更新发送目标addrCli(不一定是客户端,也可能是DNS服务器*/
 			if ((recvBuf[2] & 0x80) >> 7 == 0) {
-				printf("收到一个请求报文。内容如下:\n");
+				debugPrintf("收到一个请求报文。内容如下:\n");
 				//DebugBuffer(recvBuf, recvByte);	/*打印buffer--debug*/
 				sendByte = ResolveQuery(recvBuf, sendBuf, recvByte, &addrCli);
 				if (sendByte < 0) { /*处理query失败*/
-					printf("failed to solved query.\n");
+					debugPrintf("failed to solved query.\n");
 					break;
 				}
 			} else {
-				printf("收到一个响应报文。内容如下:\n");
+				debugPrintf("收到一个响应报文。内容如下:\n");
 				//DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
 				sendByte = ResolveResponse(recvBuf, sendBuf, recvByte, &addrCli);
 				if (sendByte < 0) { /*处理response失败*/
-					printf("failed to solved response.\n");
+					debugPrintf("failed to solved response.\n");
 					break;
 				}
 			}
 
 			/*发送报文*/
-			printf("datagram sending to %s:%d\n",
+			debugPrintf("datagram sending to %s:%d\n",
 				inet_ntop(AF_INET, (void*)&addrCli.sin_addr, ipStrBuf, 16),
 				htons(addrCli.sin_port)
 			);
 			addrCliSize = sizeof(addrCli);
 			sendto(sockSrv, (char*)sendBuf, sendByte, 0, (SOCKADDR*)&addrCli, addrCliSize);
-			printf("datagram sending succeed %d Bytes in all.\n", sendByte);
+			debugPrintf("datagram sending succeed %d Bytes in all.\n", sendByte);
 
 			/*打印发送的内容--debug*/
 			if ((sendBuf[2] & 0x80) >> 7 == 0) {
-				printf("发送一个请求报文。内容如下:\n");
+				debugPrintf("发送一个请求报文。内容如下:\n");
 				//DebugBuffer(sendBuf, sendByte);/*打印buffer*/
 			} else {
-				printf("发送一个响应报文。内容如下:\n");
+				debugPrintf("发送一个响应报文。内容如下:\n");
 				//DebugBuffer(sendBuf, sendByte);/*打印buffer*/
 			}
 
@@ -205,15 +205,15 @@ int main(int argc, char* argv[]) {
 
 	/* 运行结束, socket关闭 */
 	if (closesocket(sockSrv) != 0)
-		printf("close socket failed with error %ld\n", GetLastError());
+		debugPrintf("close socket failed with error %ld\n", GetLastError());
 	else
-		printf("socket closed.\n");
+		debugPrintf("socket closed.\n");
 
 	/* 运行结束, 清理缓存 */
 	if (WSACleanup() != 0)
-		printf("WSA clean up failed with error %ld\n", GetLastError());
+		debugPrintf("WSA clean up failed with error %ld\n", GetLastError());
 	else
-		printf("clean up is OK.\n");
+		debugPrintf("clean up is OK.\n");
 
 
 	return 0;

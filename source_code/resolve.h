@@ -11,10 +11,10 @@
 	Discription:	DNS头部结构体,12字节
 	Attributes:		暂时来说每个属性两字节,
 */
-typedef struct dnsheader{
-	unsigned short ID;		
+typedef struct dnsheader {
+	unsigned short ID;
 	unsigned short FLAGS;	/*2字节的各种flag*/
-	unsigned short QDCOUNT;	
+	unsigned short QDCOUNT;
 	unsigned short ANCOUNT;
 	unsigned short NSCOUNT;
 	unsigned short ARCOUNT;
@@ -22,15 +22,15 @@ typedef struct dnsheader{
 
 /*
 	Discription:	处理接收到query包的情况
-	params:			
+	params:
 		recvBuf:	接收缓存(传入参数)
 		sendBuf:	发送缓存(传出参数)
 		recvByte:	接收到的字节数(传入参数)
 		addrCli:	&新的目标地址(传出参数)
 	return:			int	---- 最终写入到sendBuf的字节数
-					
+
 */
-extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf,  int recvByte, SOCKADDR_IN* addrCli);
+extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli);
 
 /*
 	Discription:	处理接收到Response包的情况

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdarg.h>
 #include "database.h"
 
 /* 全局配置 */
@@ -60,3 +61,9 @@ extern void ClearBuffer(unsigned char* buf, int bufSize);
 		0			不符合格式
 */
 extern int dealOpts(int argc, char* argv[]);
+
+/*
+	重新封装printf()
+	调试级别>=1才打印
+*/
+extern void debugPrintf(const char* cmd, ...);

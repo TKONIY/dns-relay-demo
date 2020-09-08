@@ -12,8 +12,8 @@
 */
 static int domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 	/*第一个字符不要*/
-	
-	memcpy(pName, nName+1, strlen((char*)nName));/*网络域名也以\0结束,可以使用strlen*/
+
+	memcpy(pName, nName + 1, strlen((char*)nName));/*网络域名也以\0结束,可以使用strlen*/
 	int length;
 	length = strlen((char*)nName) + 1;
 	int i = nName[0];/*第一个点的位置*/
@@ -21,7 +21,7 @@ static int domainName_ntop(const unsigned char* nName, unsigned char* pName) {
 		int offset = pName[i];				/*下一段的长度*/
 		pName[i] = '.';						/*分隔*/
 		/*printf("i=%d\n", i);*/			/*调试用*/
-		i += offset+1;						/*跳到下一个分隔处*/
+		i += offset + 1;						/*跳到下一个分隔处*/
 	}
 	return length;
 }
@@ -31,7 +31,7 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
 	domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
 	if (FindInDNSDatabase(domainName, ip)) {	/*如果找到记录*/
-		printf("在数据库中找到了记录 %s : %s\n", domainName, ip);
+		debugPrintf("在数据库中找到了记录 %s : %s\n", domainName, ip);
 		memcpy(sendBuf, recvBuf, recvByte);		/*将接收内容复制到发送缓冲*/
 		sendBuf[2] |= 0x80;						/*QR=response*/
 		sendBuf[2] |= 0x05;						/*Authority=1*/
@@ -56,10 +56,10 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		return recvByte + 16;					/*sendBuf的大小*/
 
 	} else {
-		printf("没有在数据库中找到记录: %s\n", domainName);
+		debugPrintf("没有在数据库中找到记录: %s\n", domainName);
 		/*如果在数据库中找不到,则直接转发给本地DNS服务器---*/
 		DNSHeader* header = (DNSHeader*)recvBuf;
-		printf("收到ID为%x的请求报文\n", ntohs(header->ID));
+		debugPrintf("收到ID为%x的请求报文\n", ntohs(header->ID));
 		DNSID newID = ntohs(header->ID);
 		if (PushCRecord(addrCli, &newID)) {/*如果成功加入队列*/
 			//SetTime();
@@ -76,15 +76,15 @@ extern int ResolveQuery(const unsigned char* recvBuf, unsigned char* sendBuf, in
 		} else { /*队列已满，失败*/
 			return -1;
 		}
-	} 
+	}
 }
 
 extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf, int recvByte, SOCKADDR_IN* addrCli) {
 	//char temttl[16] = { '\0' };
 	char ip[16] = { '\0' };								/*存放ip*/
 	char domainName[MAX_DOMAINNAME] = { '\0' };			/*存放域名*/
-	int domainlen;                                            
-	
+	int domainlen;
+
 	domainlen = domainName_ntop(recvBuf + 12, domainName);	/*获取域名*/
 	inet_ntop(AF_INET, recvBuf + (12 + domainlen + 16), ip, 16);
 	int ttl = ntohl(*((int*)(recvBuf + (12 + domainlen + 10))));
@@ -95,25 +95,25 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 
 	//printf("*pttl: %d\n", *pttl);
 	//printf("char2ttl: %d\n", recvBuf[12 + domainlen + 13]);
-	
+
 	//DebugBuffer(recvBuf + (12 + domainlen + 10), 8);
-	printf("ttl在此:%d\n",ttl);
+	debugPrintf("ttl在此:%d\n", ttl);
 	//memcpy(ip, tempBuf + (recvByte - 4), 4);
 	//int ttl;
 	//unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/
 	/*FindCRecord要用到的两个参数*/
 	//memcpy(tempBuf, recvBuf, recvByte);
-	
+
 	//memcpy(ip, tempBuf + (recvByte - 4), 4);
 	//memcpy(temttl, tempBuf + (recvByte - 10), 4);
 	//DebugBuffer(temttl, 4);
 	//DebugBuffer(ip,4);
 	//CRecord* pRecord = (CRecord*)tempBuf;	/*TODO!!! 什么鬼, 快改掉,*/
-	const DNSHeader* recvHeader = (DNSHeader*)recvBuf;			
-	printf("收到ID为%x的响应报文\n", ntohs(recvHeader->ID));
+	const DNSHeader* recvHeader = (DNSHeader*)recvBuf;
+	debugPrintf("收到ID为%x的响应报文\n", ntohs(recvHeader->ID));
 	/*外部DNS给出的ID是newID，FindCRecord前记录Buf*/
-	DNSID newID = ntohs(recvHeader->ID);		
-	
+	DNSID newID = ntohs(recvHeader->ID);
+
 	/*TODO*/
 	/*
 		把查询到的结果更新到cache, 需要从DNS报文中获取TTL, 域名, IP;
@@ -127,7 +127,7 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 		if (pRecord->r == 0) {
 			SetCRecordR(newID); /*未回复则回复并把r置为1*/
 			/*printf("ID为 %hu 的报文已经回复\n", newID);*/
-		}else {
+		} else {
 			return -1; /*回复过就不做操作*/
 		}
 		memcpy(sendBuf, recvBuf, recvByte);			/*接受内容复制到发送缓存*/
@@ -143,8 +143,7 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 		//inet_pton(AF_INET, pRecord->addr., &addrCli->sin_addr);
 		/*printf("address: %x\n", addrCli->sin_addr);*/
 		return recvByte;
-	}
-	else {
+	} else {
 		return -1;
 	}
 }
