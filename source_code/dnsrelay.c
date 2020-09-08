@@ -160,7 +160,7 @@ int main(int argc, char* argv[]) {
 			/*判断接收的是response还是query,更新报文sendBuf,更新发送目标addrCli(不一定是客户端,也可能是DNS服务器*/
 			if ((recvBuf[2] & 0x80) >> 7 == 0) {
 				debugPrintf("收到一个请求报文。内容如下:\n");
-				//DebugBuffer(recvBuf, recvByte);	/*打印buffer--debug*/
+				DebugBuffer(recvBuf, recvByte);	/*打印buffer--debug*/
 				sendByte = ResolveQuery(recvBuf, sendBuf, recvByte, &addrCli);
 				if (sendByte < 0) { /*处理query失败*/
 					debugPrintf("failed to solved query.\n");
@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
 				}
 			} else {
 				debugPrintf("收到一个响应报文。内容如下:\n");
-				//DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
+				DebugBuffer(recvBuf, recvByte);/*打印buffer--debug*/
 				sendByte = ResolveResponse(recvBuf, sendBuf, recvByte, &addrCli);
 				if (sendByte < 0) { /*处理response失败*/
 					debugPrintf("failed to solved response.\n");
@@ -188,10 +188,10 @@ int main(int argc, char* argv[]) {
 			/*打印发送的内容--debug*/
 			if ((sendBuf[2] & 0x80) >> 7 == 0) {
 				debugPrintf("发送一个请求报文。内容如下:\n");
-				//DebugBuffer(sendBuf, sendByte);/*打印buffer*/
+				DebugBuffer(sendBuf, sendByte);/*打印buffer*/
 			} else {
 				debugPrintf("发送一个响应报文。内容如下:\n");
-				//DebugBuffer(sendBuf, sendByte);/*打印buffer*/
+				DebugBuffer(sendBuf, sendByte);/*打印buffer*/
 			}
 
 			/*if sendByte == sendto() 检查字节数*/
