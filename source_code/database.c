@@ -334,7 +334,7 @@ int FindInDNSDatabase(const char* domainName, char* ip) {
 
 	/*先在cache里面找*/
 	if (FindInDNSCache(domainName, ip)) {
-		printf("在cache中找到\n");
+		debugPrintf("在cache中找到\n");
 		return 1;
 	}
 

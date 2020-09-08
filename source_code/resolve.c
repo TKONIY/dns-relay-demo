@@ -97,7 +97,7 @@ extern int ResolveResponse(const unsigned char* recvBuf, unsigned char* sendBuf,
 	//printf("char2ttl: %d\n", recvBuf[12 + domainlen + 13]);
 
 	//DebugBuffer(recvBuf + (12 + domainlen + 10), 8);
-	debugPrintf("ttl在此:%d\n", ttl);
+	//debugPrintf("ttl在此:%d\n", ttl);
 	//memcpy(ip, tempBuf + (recvByte - 4), 4);
 	//int ttl;
 	//unsigned char tempBuf[MAX_BUFSIZE] = { '\0' };/*FindCRecord函数貌似会改变recvBuf,tempBuf记录改变前的*/

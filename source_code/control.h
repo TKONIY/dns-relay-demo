@@ -29,8 +29,6 @@ int gDebugLevel;					/*调试等级*/
 	.....
 */
 
-
-
 /********************** Buffer API **********************/
 
 /* 
@@ -60,7 +58,7 @@ extern void ClearBuffer(unsigned char* buf, int bufSize);
 		1			符合格式
 		0			不符合格式
 */
-extern int dealOpts(int argc, char* argv[]);
+extern int dealOpts(int argc, char* argv[]); 
 
 /*
 	重新封装printf()

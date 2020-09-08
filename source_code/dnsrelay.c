@@ -19,7 +19,6 @@ event_type WaitForEvent(SOCKET fd) {
 	{
 		//DebugCTable(); /*查看Client队列空间*/
 
-
 		CRecord record = { 0 };
 		if (CTableUsage()
 			&& FindCRecord(GetCTableFrontIndex(), &record)

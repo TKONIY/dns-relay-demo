@@ -65,9 +65,9 @@ int CTableUsage();
 	Discription:		向ClientTable的队尾添加记录
 	Params:			
 		SOCKADDR* pAddr	地址(传入)
-		DNSID id		原id
+		DNSID id		原id(传入传出)
 	Return:				
-		char			0/1表示是否成功
+		int			0/1表示是否成功
 	Remarks:			自动计算超时时刻
 */
 extern int PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
@@ -77,7 +77,7 @@ extern int PushCRecord(const SOCKADDR_IN* pAddr, DNSID *pId);
 	Params:
 		DNSID id		指定的DNS报文
 	Return:
-		char			0/1表示是否成功
+		int			0/1表示是否成功
 */
 extern int PopCRecord();
 
@@ -87,7 +87,7 @@ extern int PopCRecord();
 	Params:
 		DNSID id		指定的DNS报文
 	Return:
-		char			0/1表示是否成功
+		int			0/1表示是否成功
 */
 extern int SetCRecordR(DNSID id);
 
@@ -97,7 +97,7 @@ extern int SetCRecordR(DNSID id);
 		DNSID id;			id
 		CRecord* pRecord	存放record的地址 传出参数
 	Return
-		char				0/1表示是否成功。
+		int				0/1表示是否成功。
 */
 extern int FindCRecord(DNSID id, CRecord* pRecord);
 
@@ -117,7 +117,7 @@ extern int GetCTableRearIndex();
 		int				序号	
 */
 extern int GetCTableFrontIndex();
-//
+
 ///*
 //	Discription:		队首元素是否回复
 //	Params:
@@ -167,8 +167,6 @@ extern int FindInDNSDatabase(const char* domainName, char*ip);
 
 
 /******************DNSCache系列方法***********************/
-
-
 
 /*
 	Discription:	添加记录到DNSCache
