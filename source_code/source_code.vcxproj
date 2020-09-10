@@ -143,13 +143,11 @@
     <ClCompile Include="database.c" />
     <ClCompile Include="dnsrelay.c" />
     <ClCompile Include="resolve.c" />
-    <ClCompile Include="sqlite3.c" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="control.h" />
     <ClInclude Include="database.h" />
     <ClInclude Include="resolve.h" />
-    <ClInclude Include="sqlite3.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
